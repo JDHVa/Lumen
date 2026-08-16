@@ -5,7 +5,7 @@ import { Aviso } from "@/components/ui/Aviso";
 import { Tarjeta } from "@/components/ui/Tarjeta";
 import { FormularioPerfil } from "@/app/zhensi/perfil/FormularioPerfil";
 import { cargarDatosPerfil } from "@/app/zhensi/perfil/datos";
-import { BLOQUES, DIAS } from "@/lib/horarios";
+import { DIAS, etiquetaDeBloque } from "@/lib/horarios";
 
 export const dynamic = "force-dynamic";
 
@@ -34,13 +34,10 @@ export default async function PaginaZhensiAdmin({
 
   const porDia = DIAS.map((dia) => ({
     nombre: dia.nombre,
+    enLinea: dia.enLinea,
     horas: bloques
       .filter((bloque) => bloque.dia_semana === dia.numero)
-      .map(
-        (bloque) =>
-          BLOQUES.find((item) => item.inicio === bloque.hora_inicio)?.etiqueta ??
-          bloque.hora_inicio,
-      ),
+      .map((bloque) => etiquetaDeBloque(dia.numero, bloque.hora_inicio)),
   })).filter((dia) => dia.horas.length > 0);
 
   return (
@@ -75,6 +72,7 @@ export default async function PaginaZhensiAdmin({
           {porDia.map((dia) => (
             <span key={dia.nombre} className="text-sm text-tinta-suave">
               {dia.nombre}: {dia.horas.join(", ")}
+              {dia.enLinea ? " (en línea)" : ""}
             </span>
           ))}
         </Tarjeta>

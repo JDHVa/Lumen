@@ -4,6 +4,7 @@ import { Tarjeta } from "@/components/ui/Tarjeta";
 import { Etiqueta } from "@/components/ui/Etiqueta";
 import { EncabezadoPublico } from "@/components/EncabezadoPublico";
 import { PiePublico } from "@/components/PiePublico";
+import { MODALIDAD_EN_LINEA } from "@/lib/horarios";
 
 const pasos = [
   {
@@ -76,6 +77,10 @@ export default function PaginaInicio() {
             <p className="max-w-sm leading-relaxed text-tinta-suave">
               Aquí van a aparecer las sesiones ya agendadas, con la materia, el
               zhensi que la da, el día, la hora y el salón.
+            </p>
+            <p className="max-w-sm leading-relaxed text-tinta-suave">
+              Entre semana son presenciales, de 12 a 5 de la tarde.{" "}
+              <strong className="text-marino">{MODALIDAD_EN_LINEA}</strong>
             </p>
           </Tarjeta>
         </section>

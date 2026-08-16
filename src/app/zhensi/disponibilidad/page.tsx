@@ -1,7 +1,8 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { claveBloque } from "@/lib/horarios";
+import { claveBloque, MODALIDAD_EN_LINEA } from "@/lib/horarios";
+import { Aviso } from "@/components/ui/Aviso";
 import { Cuadricula } from "./Cuadricula";
 
 export const dynamic = "force-dynamic";
@@ -30,6 +31,12 @@ export default async function PaginaDisponibilidad() {
           le dice al admin cuándo buscarte.
         </p>
       </div>
+
+      <Aviso tono="neutral">
+        Entre semana las sesiones son de 12 a 5 de la tarde, presenciales.{" "}
+        {MODALIDAD_EN_LINEA} Van de 7 de la mañana a 7 de la noche, y así se le
+        va a mostrar al schüler cuando vea el tablero.
+      </Aviso>
 
       <Cuadricula marcados={marcados} />
     </div>

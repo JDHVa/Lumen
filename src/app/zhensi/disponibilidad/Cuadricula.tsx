@@ -4,7 +4,8 @@ import { useActionState, useState } from "react";
 import { Boton } from "@/components/ui/Boton";
 import { Aviso } from "@/components/ui/Aviso";
 import { Tarjeta } from "@/components/ui/Tarjeta";
-import { BLOQUES, DIAS, claveBloque } from "@/lib/horarios";
+import { DIAS, claveBloque, buscarDia } from "@/lib/horarios";
+import { Etiqueta } from "@/components/ui/Etiqueta";
 import {
   guardarDisponibilidad,
   type EstadoDisponibilidad,
@@ -29,7 +30,8 @@ export function Cuadricula({ marcados }: { marcados: string[] }) {
   }
 
   function alternarDia(dia: number) {
-    const claves = BLOQUES.map((bloque) => claveBloque(dia, bloque.inicio));
+    const bloques = buscarDia(dia)?.bloques ?? [];
+    const claves = bloques.map((bloque) => claveBloque(dia, bloque.inicio));
     const completo = claves.every((clave) => seleccion.has(clave));
     setSeleccion((previa) => {
       const nueva = new Set(previa);
@@ -49,28 +51,33 @@ export function Cuadricula({ marcados }: { marcados: string[] }) {
 
       <div className="flex flex-col gap-3">
         {DIAS.map((dia) => {
-          const claves = BLOQUES.map((bloque) =>
+          const claves = dia.bloques.map((bloque) =>
             claveBloque(dia.numero, bloque.inicio),
           );
           const cuantos = claves.filter((clave) => seleccion.has(clave)).length;
 
           return (
             <Tarjeta key={dia.numero} className="flex flex-col gap-3 py-4">
-              <div className="flex items-center justify-between gap-3">
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
                 <span className="font-titulos text-lg font-semibold text-marino">
                   {dia.nombre}
                 </span>
+                {dia.enLinea ? (
+                  <Etiqueta tono="dorado">en línea</Etiqueta>
+                ) : null}
                 <button
                   type="button"
                   onClick={() => alternarDia(dia.numero)}
-                  className="min-h-[40px] px-1 text-sm text-tinta-suave underline underline-offset-4 hover:text-marino"
+                  className="ml-auto min-h-[40px] px-1 text-sm text-tinta-suave underline underline-offset-4 hover:text-marino"
                 >
-                  {cuantos === BLOQUES.length ? "Quitar el día" : "Todo el día"}
+                  {cuantos === dia.bloques.length
+                    ? "Quitar el día"
+                    : "Todo el día"}
                 </button>
               </div>
 
-              <div className="grid grid-cols-3 gap-2 sm:grid-cols-5">
-                {BLOQUES.map((bloque) => {
+              <div className="grid grid-cols-4 gap-2 sm:grid-cols-6">
+                {dia.bloques.map((bloque) => {
                   const clave = claveBloque(dia.numero, bloque.inicio);
                   const activo = seleccion.has(clave);
 
@@ -80,7 +87,7 @@ export function Cuadricula({ marcados }: { marcados: string[] }) {
                       type="button"
                       onClick={() => alternar(clave)}
                       aria-pressed={activo}
-                      aria-label={`${dia.nombre} de ${bloque.etiqueta} de la tarde`}
+                      aria-label={`${dia.nombre} a la ${bloque.etiqueta}`}
                       className={`min-h-[48px] rounded-suave border text-sm font-medium transition-colors duration-150 ${
                         activo
                           ? "border-marino bg-marino text-white"
