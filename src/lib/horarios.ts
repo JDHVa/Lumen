@@ -4,8 +4,6 @@ export const DIAS = [
   { numero: 3, nombre: "Miércoles" },
   { numero: 4, nombre: "Jueves" },
   { numero: 5, nombre: "Viernes" },
-  { numero: 6, nombre: "Sábado" },
-  { numero: 7, nombre: "Domingo" },
 ] as const;
 
 export const BLOQUES = [
