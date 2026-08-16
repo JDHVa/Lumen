@@ -1,0 +1,17 @@
+@import "tailwindcss";
+
+@theme {
+  --color-marino: #0f3d68;
+  --color-marino-claro: #1b5288;
+  --color-dorado: #f0b94a;
+  --color-arena: #fbf8f2;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background-color: var(--color-arena);
+  color: var(--color-marino);
+}
