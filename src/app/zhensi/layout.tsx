@@ -12,13 +12,15 @@ export default async function LayoutZhensi({
   if (!sesion?.user) redirect("/entrar?regresar=/zhensi");
 
   return (
-    <div className="min-h-screen">
+    <div className="flex min-h-screen flex-col">
       <BarraSesion
         nombre={sesion.user.nombre}
         esAdmin={sesion.user.es_admin}
         zona="zhensi"
       />
-      <main className="mx-auto max-w-3xl px-4 py-8">{children}</main>
+      <main className="mx-auto w-full max-w-4xl flex-1 px-5 py-8">
+        {children}
+      </main>
     </div>
   );
 }
