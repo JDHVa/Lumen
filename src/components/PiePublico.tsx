@@ -8,14 +8,9 @@ export function PiePublico() {
           Lumen es una red de apoyo académico entre pares. No es un servicio de
           atención psicológica.
         </p>
-        <div className="flex flex-wrap items-center gap-4">
-          <Link href="/privacidad" className="underline underline-offset-4">
-            Aviso de privacidad
-          </Link>
-          <Link href="/entrar" className="underline underline-offset-4">
-            Entrar como zhensi
-          </Link>
-        </div>
+        <Link href="/privacidad" className="underline underline-offset-4">
+          Aviso de privacidad
+        </Link>
       </div>
     </footer>
   );

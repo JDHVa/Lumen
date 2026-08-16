@@ -9,7 +9,7 @@ export default async function LayoutZhensi({
 }) {
   const sesion = await auth();
 
-  if (!sesion?.user) redirect("/entrar?regresar=/zhensi");
+  if (!sesion?.user) redirect("/iniciarsesion?regresar=/zhensi");
 
   return (
     <div className="flex min-h-screen flex-col">

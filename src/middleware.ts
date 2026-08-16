@@ -14,7 +14,7 @@ export default auth((peticion) => {
   if (!zonaZhensi && !zonaAdmin) return NextResponse.next();
 
   if (!sesion?.user) {
-    const destino = new URL("/entrar", peticion.nextUrl);
+    const destino = new URL("/iniciarsesion", peticion.nextUrl);
     destino.searchParams.set("regresar", ruta);
     return NextResponse.redirect(destino);
   }

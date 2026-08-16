@@ -10,7 +10,7 @@ export default async function LayoutAdmin({
 }) {
   const sesion = await auth();
 
-  if (!sesion?.user) redirect("/entrar?regresar=/admin");
+  if (!sesion?.user) redirect("/iniciarsesion?regresar=/admin");
   if (!sesion.user.es_admin) redirect("/zhensi");
 
   return (
