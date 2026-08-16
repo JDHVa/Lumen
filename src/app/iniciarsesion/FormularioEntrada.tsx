@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 import { Boton } from "@/components/ui/Boton";
 import { Campo } from "@/components/ui/Campo";
+import { CampoContrasena } from "@/components/ui/CampoContrasena";
 import { Aviso } from "@/components/ui/Aviso";
 import { entrar, type EstadoEntrada } from "./acciones";
 
@@ -25,10 +26,9 @@ export function FormularioEntrada({ regresar }: { regresar: string }) {
         required
       />
 
-      <Campo
+      <CampoContrasena
         etiqueta="Contraseña"
         name="contrasena"
-        type="password"
         autoComplete="current-password"
         required
       />

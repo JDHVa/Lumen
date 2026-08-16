@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 import { Boton } from "@/components/ui/Boton";
 import { Campo, Casilla } from "@/components/ui/Campo";
+import { CampoContrasena } from "@/components/ui/CampoContrasena";
 import { Aviso } from "@/components/ui/Aviso";
 import { crearUsuario, type EstadoAlta } from "./acciones";
 
@@ -29,10 +30,11 @@ export function FormularioAlta() {
         ayuda="Con esto inicia sesión. No se usa ningún correo."
       />
 
-      <Campo
+      <CampoContrasena
         etiqueta="Contraseña"
         name="contrasena"
-        type="text"
+        visibleInicial
+        autoComplete="new-password"
         required
         minLength={8}
         ayuda="Mínimo 8 caracteres. Se guarda cifrada, así que anótala y entrégasela a la persona."
