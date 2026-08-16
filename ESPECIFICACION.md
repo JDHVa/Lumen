@@ -63,8 +63,13 @@ Los cinco admin tienen permisos idénticos. No hay superadministrador.
 ## 5. Modelo de datos
 
 ### usuario
-`id`, `nombre`, `correo`, `contrasena_hash`, `es_zhensi` (bool),
+`id`, `nombre`, `usuario`, `contrasena_hash`, `es_zhensi` (bool),
 `es_admin` (bool), `activo` (bool), `creado_en`
+
+`usuario` es un nombre de acceso corto que asigna el admin al crear la cuenta.
+**No se guarda ningún correo electrónico de zhensis ni de admin.** El sistema
+no envía correos, así que el dato no hace falta, y no guardarlo es la forma más
+segura de que no se pueda filtrar.
 
 ### perfil_zhensi
 `usuario_id`, `foto_url`, `carrera_id`, `semestre`, `descripcion_corta`
