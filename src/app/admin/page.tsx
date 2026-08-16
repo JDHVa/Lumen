@@ -3,7 +3,6 @@ import { Tarjeta } from "@/components/ui/Tarjeta";
 import { Etiqueta } from "@/components/ui/Etiqueta";
 
 const pendientes = [
-  { titulo: "Solicitudes públicas", fase: "Fase 3" },
   { titulo: "Demanda y asignación", fase: "Fase 4" },
   { titulo: "Sesiones", fase: "Fase 4" },
   { titulo: "Dashboard", fase: "Fase 6" },
@@ -31,6 +30,16 @@ export default function PaginaAdmin() {
             </p>
           </div>
           <BotonEnlace href="/admin/usuarios">Abrir</BotonEnlace>
+        </Tarjeta>
+
+        <Tarjeta elevada className="flex flex-wrap items-center justify-between gap-4">
+          <div className="flex flex-col gap-1">
+            <h2 className="text-xl font-semibold">Solicitudes</h2>
+            <p className="text-sm text-tinta-suave">
+              Lo que está pidiendo la gente, y la limpieza.
+            </p>
+          </div>
+          <BotonEnlace href="/admin/solicitudes">Abrir</BotonEnlace>
         </Tarjeta>
 
         <Tarjeta elevada className="flex flex-wrap items-center justify-between gap-4">
