@@ -76,7 +76,7 @@ export function Cuadricula({ marcados }: { marcados: string[] }) {
                 </button>
               </div>
 
-              <div className="grid grid-cols-4 gap-2 sm:grid-cols-6">
+              <div className="grid grid-cols-3 gap-2 sm:grid-cols-6">
                 {dia.bloques.map((bloque) => {
                   const clave = claveBloque(dia.numero, bloque.inicio);
                   const activo = seleccion.has(clave);
@@ -87,7 +87,7 @@ export function Cuadricula({ marcados }: { marcados: string[] }) {
                       type="button"
                       onClick={() => alternar(clave)}
                       aria-pressed={activo}
-                      aria-label={`${dia.nombre} a la ${bloque.etiqueta}`}
+                      aria-label={`${dia.nombre} de ${bloque.etiqueta}`}
                       className={`min-h-[48px] rounded-suave border text-sm font-medium transition-colors duration-150 ${
                         activo
                           ? "border-marino bg-marino text-white"

@@ -79,7 +79,7 @@ export default function PaginaInicio() {
               zhensi que la da, el día, la hora y el salón.
             </p>
             <p className="max-w-sm leading-relaxed text-tinta-suave">
-              Entre semana son presenciales, de 12 a 5 de la tarde.{" "}
+              Entre semana son presenciales, de 12 a 6 de la tarde.{" "}
               <strong className="text-marino">{MODALIDAD_EN_LINEA}</strong>
             </p>
           </Tarjeta>

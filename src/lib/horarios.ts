@@ -4,28 +4,31 @@ export type Bloque = {
   etiqueta: string;
 };
 
-function armarBloques(desde: number, hasta: number): Bloque[] {
+function armarBloques(desde: number, hasta: number, duracion: number): Bloque[] {
   const bloques: Bloque[] = [];
 
-  for (let hora = desde; hora < hasta; hora += 1) {
+  for (let hora = desde; hora + duracion <= hasta; hora += duracion) {
     bloques.push({
       inicio: `${String(hora).padStart(2, "0")}:00`,
-      fin: `${String(hora + 1).padStart(2, "0")}:00`,
-      etiqueta: etiquetaHora(hora),
+      fin: `${String(hora + duracion).padStart(2, "0")}:00`,
+      etiqueta: etiquetaRango(hora, hora + duracion),
     });
   }
 
   return bloques;
 }
 
-export function etiquetaHora(hora: number) {
-  const meridiano = hora < 12 ? "am" : "pm";
-  const doce = hora % 12 === 0 ? 12 : hora % 12;
-  return `${doce} ${meridiano}`;
+function reloj(hora: number) {
+  return hora % 12 === 0 ? 12 : hora % 12;
 }
 
-const ENTRE_SEMANA = armarBloques(12, 17);
-const FIN_DE_SEMANA = armarBloques(7, 19);
+export function etiquetaRango(desde: number, hasta: number) {
+  const meridiano = hasta > 12 && hasta < 24 ? "pm" : "am";
+  return `${reloj(desde)}–${reloj(hasta)} ${meridiano}`;
+}
+
+const ENTRE_SEMANA = armarBloques(12, 18, 1);
+const FIN_DE_SEMANA = armarBloques(7, 19, 2);
 
 export const MODALIDAD_EN_LINEA =
   "Las sesiones de sábado y domingo son en línea.";
