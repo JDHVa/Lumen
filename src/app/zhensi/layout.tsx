@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { BarraSesion } from "@/components/BarraSesion";
+import { NavegacionZhensi } from "@/components/NavegacionZhensi";
 
 export default async function LayoutZhensi({
   children,
@@ -18,6 +19,7 @@ export default async function LayoutZhensi({
         esAdmin={sesion.user.es_admin}
         zona="zhensi"
       />
+      <NavegacionZhensi />
       <main className="mx-auto w-full max-w-4xl flex-1 px-5 py-8">
         {children}
       </main>

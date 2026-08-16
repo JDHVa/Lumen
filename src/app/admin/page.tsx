@@ -3,7 +3,6 @@ import { Tarjeta } from "@/components/ui/Tarjeta";
 import { Etiqueta } from "@/components/ui/Etiqueta";
 
 const pendientes = [
-  { titulo: "Perfil y disponibilidad del zhensi", fase: "Fase 2" },
   { titulo: "Solicitudes públicas", fase: "Fase 3" },
   { titulo: "Demanda y asignación", fase: "Fase 4" },
   { titulo: "Sesiones", fase: "Fase 4" },
@@ -42,6 +41,16 @@ export default function PaginaAdmin() {
             </p>
           </div>
           <BotonEnlace href="/admin/catalogo">Abrir</BotonEnlace>
+        </Tarjeta>
+
+        <Tarjeta elevada className="flex flex-wrap items-center justify-between gap-4">
+          <div className="flex flex-col gap-1">
+            <h2 className="text-xl font-semibold">Zhensis</h2>
+            <p className="text-sm text-tinta-suave">
+              Revisa perfiles, asigna materias y da de baja.
+            </p>
+          </div>
+          <BotonEnlace href="/admin/zhensis">Abrir</BotonEnlace>
         </Tarjeta>
       </div>
 

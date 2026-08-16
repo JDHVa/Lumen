@@ -4,23 +4,19 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const enlaces = [
-  { href: "/admin", texto: "Inicio" },
-  { href: "/admin/usuarios", texto: "Usuarios" },
-  { href: "/admin/catalogo", texto: "Catálogo" },
-  { href: "/admin/zhensis", texto: "Zhensis" },
+  { href: "/zhensi", texto: "Inicio" },
+  { href: "/zhensi/perfil", texto: "Mi perfil" },
+  { href: "/zhensi/disponibilidad", texto: "Mi disponibilidad" },
 ];
 
-export function NavegacionAdmin() {
+export function NavegacionZhensi() {
   const ruta = usePathname();
 
   return (
     <nav className="border-b border-marino/10 bg-white">
       <div className="mx-auto flex max-w-4xl gap-1 overflow-x-auto px-5">
         {enlaces.map((enlace) => {
-          const activo =
-            enlace.href === "/admin"
-              ? ruta === enlace.href
-              : ruta.startsWith(enlace.href);
+          const activo = ruta === enlace.href;
           return (
             <Link
               key={enlace.href}
