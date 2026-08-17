@@ -75,10 +75,7 @@ export async function subirApunte(
   revalidatePath("/zhensi/apuntes");
   revalidatePath("/admin/apuntes");
 
-  return {
-    exito:
-      "Ya se subió. Un admin lo tiene que aprobar antes de que se vea en el sitio.",
-  };
+  return { exito: "Ya quedó publicado. Cualquiera puede bajarlo." };
 }
 
 export async function borrarApunte(datos: FormData) {

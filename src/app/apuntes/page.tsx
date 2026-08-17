@@ -11,7 +11,6 @@ export const dynamic = "force-dynamic";
 export default async function PaginaApuntes() {
   const [crudos, carreras] = await Promise.all([
     db.apunte.findMany({
-      where: { aprobado: true },
       orderBy: { creado_en: "desc" },
       take: 300,
       select: {
@@ -48,9 +47,8 @@ export default async function PaginaApuntes() {
         <div className="flex flex-col gap-2 pb-8">
           <h1 className="text-3xl font-bold sm:text-4xl">Apuntes</h1>
           <p className="max-w-2xl leading-relaxed text-tinta-suave">
-            Resúmenes y material que dejaron los que ya pasaron por esa materia.
-            Todo lo revisó alguien del equipo antes de publicarse. Es gratis y
-            no necesitas cuenta para bajarlo.
+            Resúmenes y material que dejaron los que ya pasaron por esa
+            materia. Es gratis y no necesitas cuenta para bajarlo.
           </p>
         </div>
 

@@ -55,7 +55,6 @@ model usuario {
   sesiones_creadas     sesion[]         @relation("sesion_creador")
   asistencias          asistencia[]     @relation("asistencia_capturada_por")
   apuntes              apunte[]         @relation("apunte_zhensi")
-  apuntes_aprobados    apunte[]         @relation("apunte_aprobador")
   mensajes_atendidos   mensaje_buzon[]  @relation("buzon_atendido_por")
 
   @@map("usuario")
@@ -222,15 +221,10 @@ model apunte {
   zhensi_id   String
   generacion  String?
   archivo_url String
-  aprobado    Boolean  @default(false)
-  rechazado   Boolean  @default(false)
-  motivo      String?
-  aprobado_por String?
   creado_en   DateTime @default(now())
 
-  materia   materia  @relation(fields: [materia_id], references: [id])
-  zhensi    usuario  @relation("apunte_zhensi", fields: [zhensi_id], references: [id])
-  aprobador usuario? @relation("apunte_aprobador", fields: [aprobado_por], references: [id])
+  materia materia @relation(fields: [materia_id], references: [id])
+  zhensi  usuario @relation("apunte_zhensi", fields: [zhensi_id], references: [id])
 
   @@map("apunte")
 }

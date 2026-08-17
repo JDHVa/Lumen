@@ -4,53 +4,40 @@ import { Etiqueta } from "@/components/ui/Etiqueta";
 import { Seccion } from "@/components/ui/Seccion";
 import { BotonAccion } from "@/components/ui/BotonAccion";
 import { extensionDe } from "@/lib/almacenamiento";
-import { aprobarApunte } from "./acciones";
-import { Rechazo } from "./Rechazo";
 import { borrarApunte } from "@/app/zhensi/apuntes/acciones";
 
 export const dynamic = "force-dynamic";
 
 export default async function PaginaApuntesAdmin() {
   const apuntes = await db.apunte.findMany({
-    orderBy: [{ aprobado: "asc" }, { rechazado: "asc" }, { creado_en: "desc" }],
+    orderBy: { creado_en: "desc" },
     take: 200,
     select: {
       id: true,
       titulo: true,
       generacion: true,
-      aprobado: true,
-      rechazado: true,
-      motivo: true,
       archivo_url: true,
       materia: {
         select: { nombre: true, carrera: { select: { clave: true } } },
       },
       zhensi: { select: { nombre: true } },
-      aprobador: { select: { nombre: true } },
     },
   });
-
-  const pendientes = apuntes.filter(
-    (uno) => !uno.aprobado && !uno.rechazado,
-  ).length;
 
   return (
     <div className="flex flex-col gap-8">
       <div className="flex flex-col gap-2">
         <h1 className="text-3xl font-bold">Apuntes</h1>
         <p className="leading-relaxed text-tinta-suave">
-          Nada se publica sin que alguien lo apruebe. Ábrelo antes de decidir:
-          revisa que se lea, que sea de la materia que dice y que no traiga
-          datos de nadie.
+          Todo lo que han compartido los zhenshis. Se publica solo al subirse.
+          Si algo no debería estar ahí, bórralo.
         </p>
       </div>
 
       <Seccion
         titulo="Todos"
         descripcion={
-          pendientes === 0
-            ? `${apuntes.length} en total, ninguno pendiente.`
-            : `${apuntes.length} en total, ${pendientes} esperando revisión.`
+          apuntes.length === 1 ? "1 apunte." : `${apuntes.length} apuntes.`
         }
       >
         {apuntes.length === 0 ? (
@@ -61,13 +48,7 @@ export default async function PaginaApuntesAdmin() {
           <ul className="flex flex-col gap-2.5">
             {apuntes.map((apunte) => (
               <li key={apunte.id}>
-                <Tarjeta
-                  className={`flex flex-col gap-3 py-4 ${
-                    !apunte.aprobado && !apunte.rechazado
-                      ? "border-dorado/40 bg-dorado-tenue"
-                      : ""
-                  }`}
-                >
+                <Tarjeta className="flex flex-col gap-3 py-4">
                   <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
                     <span className="min-w-0 flex-1 truncate font-medium text-marino">
                       {apunte.titulo}
@@ -75,13 +56,6 @@ export default async function PaginaApuntesAdmin() {
                     <Etiqueta tono="apagado">
                       {extensionDe(apunte.archivo_url)}
                     </Etiqueta>
-                    {apunte.aprobado ? (
-                      <Etiqueta tono="dorado">publicado</Etiqueta>
-                    ) : apunte.rechazado ? (
-                      <Etiqueta tono="alerta">rechazado</Etiqueta>
-                    ) : (
-                      <Etiqueta tono="marino">pendiente</Etiqueta>
-                    )}
                   </div>
 
                   <span className="text-sm text-tinta-suave">
@@ -94,14 +68,7 @@ export default async function PaginaApuntesAdmin() {
 
                   <span className="text-sm text-tinta-suave">
                     Lo subió {apunte.zhensi.nombre}
-                    {apunte.aprobador ? ` · Lo revisó ${apunte.aprobador.nombre}` : ""}
                   </span>
-
-                  {apunte.rechazado && apunte.motivo ? (
-                    <span className="text-sm leading-relaxed text-alerta">
-                      Motivo: {apunte.motivo}
-                    </span>
-                  ) : null}
 
                   <div className="flex flex-wrap items-center gap-3">
                     <a
@@ -112,17 +79,6 @@ export default async function PaginaApuntesAdmin() {
                     >
                       Abrirlo
                     </a>
-
-                    {apunte.aprobado ? null : (
-                      <form action={aprobarApunte}>
-                        <input type="hidden" name="id" value={apunte.id} />
-                        <BotonAccion type="submit" tono="afirmar">
-                          Aprobar y publicar
-                        </BotonAccion>
-                      </form>
-                    )}
-
-                    {apunte.rechazado ? null : <Rechazo id={apunte.id} />}
 
                     <form action={borrarApunte}>
                       <input type="hidden" name="id" value={apunte.id} />

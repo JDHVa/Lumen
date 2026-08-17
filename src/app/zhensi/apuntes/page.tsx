@@ -26,9 +26,6 @@ export default async function PaginaMisApuntes() {
         id: true,
         titulo: true,
         generacion: true,
-        aprobado: true,
-        rechazado: true,
-        motivo: true,
         archivo_url: true,
         materia: { select: { nombre: true } },
       },
@@ -41,7 +38,7 @@ export default async function PaginaMisApuntes() {
         <h1 className="text-3xl font-bold">Mis apuntes</h1>
         <p className="leading-relaxed text-tinta-suave">
           Sube lo que te sirvió a ti: resúmenes, formularios, fotos de la
-          libreta. Un admin lo revisa antes de que se publique.
+          libreta. Se publica de inmediato y cualquiera puede bajarlo.
         </p>
       </div>
 
@@ -79,25 +76,13 @@ export default async function PaginaMisApuntes() {
                     <span className="min-w-0 flex-1 truncate font-medium text-marino">
                       {apunte.titulo}
                     </span>
-                    {apunte.aprobado ? (
-                      <Etiqueta tono="dorado">publicado</Etiqueta>
-                    ) : apunte.rechazado ? (
-                      <Etiqueta tono="alerta">rechazado</Etiqueta>
-                    ) : (
-                      <Etiqueta tono="apagado">esperando revisión</Etiqueta>
-                    )}
+                    <Etiqueta tono="dorado">publicado</Etiqueta>
                   </div>
 
                   <span className="text-sm text-tinta-suave">
                     {apunte.materia.nombre}
                     {apunte.generacion ? ` · ${apunte.generacion}` : ""}
                   </span>
-
-                  {apunte.rechazado && apunte.motivo ? (
-                    <span className="text-sm leading-relaxed text-alerta">
-                      Motivo: {apunte.motivo}
-                    </span>
-                  ) : null}
 
                   <div className="flex flex-wrap items-center gap-3">
                     <a
