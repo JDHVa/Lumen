@@ -1,0 +1,50 @@
+name: Respaldo semanal
+
+on:
+  schedule:
+    - cron: "0 9 * * 6"
+  workflow_dispatch:
+
+jobs:
+  respaldar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Instalar
+        run: npm ci
+
+      - name: Bajar la base
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: npm run respaldo
+
+      - name: Cifrar el respaldo
+        env:
+          CLAVE_RESPALDO: ${{ secrets.CLAVE_RESPALDO }}
+        run: |
+          if [ -z "$CLAVE_RESPALDO" ]; then
+            echo "Falta el secreto CLAVE_RESPALDO. Sin él no se sube nada."
+            exit 1
+          fi
+          for archivo in respaldos/*.json; do
+            openssl enc -aes-256-cbc -pbkdf2 -iter 200000 -salt \
+              -in "$archivo" -out "$archivo.enc" -pass env:CLAVE_RESPALDO
+            rm "$archivo"
+          done
+          ls -la respaldos/
+
+      - name: Guardarlo
+        uses: actions/upload-artifact@v4
+        with:
+          name: respaldo-lumen
+          path: respaldos/*.enc
+          retention-days: 90
+          if-no-files-found: error

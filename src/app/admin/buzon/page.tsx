@@ -131,7 +131,7 @@ export default async function PaginaBuzonAdmin() {
                     </span>
                   </div>
 
-                  <p className="leading-relaxed whitespace-pre-line text-tinta">
+                  <p className="leading-relaxed break-words whitespace-pre-line text-tinta">
                     {mensaje.contenido}
                   </p>
 

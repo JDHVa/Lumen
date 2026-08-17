@@ -113,7 +113,7 @@ export function FiltroZhensis({
                 </div>
 
                 {zhenshi.descripcion ? (
-                  <p className="leading-relaxed text-tinta-suave">
+                  <p className="leading-relaxed break-words text-tinta-suave">
                     “{zhenshi.descripcion}”
                   </p>
                 ) : null}

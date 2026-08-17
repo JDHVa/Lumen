@@ -168,7 +168,7 @@ export default async function PaginaSolicitudes({
                           : solicitud.titulo_tema}
                       </h2>
 
-                      <p className="leading-relaxed text-tinta-suave">
+                      <p className="leading-relaxed break-words text-tinta-suave">
                         {solicitud.descripcion}
                       </p>
 

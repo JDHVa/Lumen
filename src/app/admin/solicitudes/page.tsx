@@ -128,7 +128,7 @@ export default async function PaginaSolicitudes() {
                           ? (solicitud.materia?.nombre ?? "Materia")
                           : solicitud.titulo_tema}
                       </span>
-                      <span className="text-sm leading-relaxed text-tinta-suave">
+                      <span className="text-sm leading-relaxed break-words text-tinta-suave">
                         {solicitud.descripcion}
                       </span>
                     </div>

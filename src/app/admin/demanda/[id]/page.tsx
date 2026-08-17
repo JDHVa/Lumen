@@ -114,7 +114,7 @@ export default async function PaginaAgendar({
           </Etiqueta>
         </div>
         <h1 className="text-3xl font-bold">{nombreCosa}</h1>
-        <p className="leading-relaxed text-tinta-suave">
+        <p className="leading-relaxed break-words text-tinta-suave">
           {solicitud.descripcion}
         </p>
       </div>
