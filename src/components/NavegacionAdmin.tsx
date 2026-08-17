@@ -1,0 +1,48 @@
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+
+const enlaces = [
+  { href: "/admin", texto: "Inicio" },
+  { href: "/admin/dashboard", texto: "Dashboard" },
+  { href: "/admin/usuarios", texto: "Usuarios" },
+  { href: "/admin/demanda", texto: "Demanda" },
+  { href: "/admin/sesiones", texto: "Sesiones" },
+  { href: "/admin/solicitudes", texto: "Solicitudes" },
+  { href: "/admin/buzon", texto: "Buzón" },
+  { href: "/admin/apuntes", texto: "Apuntes" },
+  { href: "/admin/catalogo", texto: "Catálogo" },
+  { href: "/admin/zhensis", texto: "Zhenshis" },
+];
+
+export function NavegacionAdmin() {
+  const ruta = usePathname();
+
+  return (
+    <nav className="border-b border-marino/10 bg-white">
+      <div className="mx-auto flex max-w-4xl gap-1 overflow-x-auto px-5">
+        {enlaces.map((enlace) => {
+          const activo =
+            enlace.href === "/admin"
+              ? ruta === enlace.href
+              : ruta.startsWith(enlace.href);
+          return (
+            <Link
+              key={enlace.href}
+              href={enlace.href}
+              aria-current={activo ? "page" : undefined}
+              className={`min-h-[44px] shrink-0 border-b-2 px-3 pt-3 text-sm font-medium transition-colors ${
+                activo
+                  ? "border-dorado text-marino"
+                  : "border-transparent text-tinta-suave hover:text-marino"
+              }`}
+            >
+              {enlace.texto}
+            </Link>
+          );
+        })}
+      </div>
+    </nav>
+  );
+}

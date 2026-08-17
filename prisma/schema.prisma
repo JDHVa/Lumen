@@ -1,0 +1,251 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum tipo_solicitud {
+  materia
+  tema_especial
+}
+
+enum estado_solicitud {
+  abierta
+  agendada
+  cerrada
+  oculta
+}
+
+enum estado_sesion {
+  borrador
+  publicada
+  realizada
+  cancelada
+}
+
+enum categoria_buzon {
+  sugerencia
+  agradecimiento
+  apoyo
+}
+
+enum estado_buzon {
+  nuevo
+  en_revision
+  atendido
+}
+
+model usuario {
+  id               String   @id @default(uuid())
+  nombre           String
+  usuario          String   @unique
+  contrasena_hash  String
+  es_zhensi        Boolean  @default(true)
+  es_admin         Boolean  @default(false)
+  activo           Boolean  @default(true)
+  creado_en        DateTime @default(now())
+
+  perfil               perfil_zhensi?
+  materias             zhensi_materia[]
+  disponibilidades     disponibilidad[]
+  sesiones             sesion[]         @relation("sesion_zhensi")
+  sesiones_creadas     sesion[]         @relation("sesion_creador")
+  asistencias          asistencia[]     @relation("asistencia_capturada_por")
+  apuntes              apunte[]         @relation("apunte_zhensi")
+  apuntes_aprobados    apunte[]         @relation("apunte_aprobador")
+  mensajes_atendidos   mensaje_buzon[]  @relation("buzon_atendido_por")
+
+  @@map("usuario")
+}
+
+model intento_acceso {
+  id        String   @id @default(uuid())
+  usuario   String
+  origen    String
+  logrado   Boolean  @default(false)
+  creado_en DateTime @default(now())
+
+  @@index([usuario, creado_en])
+  @@index([origen, creado_en])
+  @@map("intento_acceso")
+}
+
+model perfil_zhensi {
+  usuario_id        String  @id
+  foto_url          String?
+
+  carrera_id        String?
+  semestre          Int?
+  descripcion_corta String? @db.VarChar(200)
+  visible_publico   Boolean @default(false)
+
+  instagram String?
+  whatsapp  String?
+  facebook  String?
+  linkedin  String?
+  github    String?
+  tiktok    String?
+
+  usuario usuario  @relation(fields: [usuario_id], references: [id], onDelete: Cascade)
+  carrera carrera? @relation(fields: [carrera_id], references: [id])
+
+  @@map("perfil_zhensi")
+}
+
+model zhensi_materia {
+  usuario_id String
+  materia_id String
+
+  usuario usuario @relation(fields: [usuario_id], references: [id], onDelete: Cascade)
+  materia materia @relation(fields: [materia_id], references: [id], onDelete: Cascade)
+
+  @@id([usuario_id, materia_id])
+  @@map("zhensi_materia")
+}
+
+model carrera {
+  id     String @id @default(uuid())
+  nombre String
+  clave  String @unique
+
+  materias   materia[]
+  perfiles   perfil_zhensi[]
+  solicitudes solicitud[]
+
+  @@map("carrera")
+}
+
+model materia {
+  id         String  @id @default(uuid())
+  nombre     String
+  carrera_id String?
+  semestre   Int?
+  activa     Boolean @default(true)
+
+  carrera     carrera?         @relation(fields: [carrera_id], references: [id])
+  zhensis     zhensi_materia[]
+  solicitudes solicitud[]
+  sesiones    sesion[]
+  apuntes     apunte[]
+
+  @@map("materia")
+}
+
+model disponibilidad {
+  id          String @id @default(uuid())
+  usuario_id  String
+  dia_semana  Int
+  hora_inicio String
+  hora_fin    String
+
+  usuario usuario @relation(fields: [usuario_id], references: [id], onDelete: Cascade)
+
+  @@map("disponibilidad")
+}
+
+model solicitud {
+  id                 String           @id @default(uuid())
+  codigo_publico     String           @unique
+  tipo               tipo_solicitud
+  materia_id         String?
+  titulo_tema        String?
+  descripcion        String
+  carrera_id         String?
+  franjas_preferidas Json
+  apoyos             Int              @default(0)
+  estado             estado_solicitud @default(abierta)
+  sesion_id          String?          @unique
+  creada_en          DateTime         @default(now())
+
+  materia          materia?          @relation(fields: [materia_id], references: [id])
+  carrera          carrera?          @relation(fields: [carrera_id], references: [id])
+  sesion           sesion?           @relation("solicitud_agendada", fields: [sesion_id], references: [id])
+  apoyos_registros apoyo_solicitud[]
+
+  @@map("solicitud")
+}
+
+model apoyo_solicitud {
+  id           String   @id @default(uuid())
+  solicitud_id String
+  huella       String
+  creado_en    DateTime @default(now())
+
+  solicitud solicitud @relation(fields: [solicitud_id], references: [id], onDelete: Cascade)
+
+  @@unique([solicitud_id, huella])
+  @@map("apoyo_solicitud")
+}
+
+model sesion {
+  id             String        @id @default(uuid())
+  zhensi_id      String
+  materia_id     String?
+  titulo         String
+  fecha          DateTime      @db.Date
+  hora_inicio    String
+  hora_fin       String
+  salon          String
+  estado         estado_sesion @default(borrador)
+  creada_por     String
+  notas_publicas String?
+  creada_en      DateTime      @default(now())
+
+  zhensi     usuario     @relation("sesion_zhensi", fields: [zhensi_id], references: [id])
+  creador    usuario     @relation("sesion_creador", fields: [creada_por], references: [id])
+  materia    materia?    @relation(fields: [materia_id], references: [id])
+  solicitud  solicitud?  @relation("solicitud_agendada")
+  asistencia asistencia?
+
+  @@map("sesion")
+}
+
+model asistencia {
+  sesion_id     String   @id
+  cantidad      Int
+  capturada_por String
+  capturada_en  DateTime @default(now())
+
+  sesion  sesion  @relation(fields: [sesion_id], references: [id], onDelete: Cascade)
+  usuario usuario @relation("asistencia_capturada_por", fields: [capturada_por], references: [id])
+
+  @@map("asistencia")
+}
+
+model apunte {
+  id          String   @id @default(uuid())
+  titulo      String
+  materia_id  String
+  zhensi_id   String
+  generacion  String?
+  archivo_url String
+  aprobado    Boolean  @default(false)
+  rechazado   Boolean  @default(false)
+  motivo      String?
+  aprobado_por String?
+  creado_en   DateTime @default(now())
+
+  materia   materia  @relation(fields: [materia_id], references: [id])
+  zhensi    usuario  @relation("apunte_zhensi", fields: [zhensi_id], references: [id])
+  aprobador usuario? @relation("apunte_aprobador", fields: [aprobado_por], references: [id])
+
+  @@map("apunte")
+}
+
+model mensaje_buzon {
+  id             String          @id @default(uuid())
+  categoria      categoria_buzon
+  contenido      String
+  nombre_opcional String?
+  prioritario    Boolean         @default(false)
+  estado         estado_buzon    @default(nuevo)
+  creado_en      DateTime        @default(now())
+  atendido_por   String?
+
+  atendedor usuario? @relation("buzon_atendido_por", fields: [atendido_por], references: [id])
+
+  @@map("mensaje_buzon")
+}

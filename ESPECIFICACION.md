@@ -24,7 +24,7 @@ Estos términos se usan tal cual en la interfaz, en el código y en la base de
 datos. No se traducen ni se sustituyen por sinónimos.
 
 - **Schüler**: cualquier alumno que busca ayuda. Nunca tiene cuenta.
-- **Zhensi**: alumno destacado que da las sesiones. Tiene cuenta.
+- **Zhenshi**: alumno destacado que da las sesiones. Tiene cuenta.
 - **Admin**: coordina el proyecto. Tiene cuenta. Todos los admin son también
   zhensi.
 - **Solicitud**: petición pública de ayuda sobre una materia o un tema
@@ -63,8 +63,13 @@ Los cinco admin tienen permisos idénticos. No hay superadministrador.
 ## 5. Modelo de datos
 
 ### usuario
-`id`, `nombre`, `correo`, `contrasena_hash`, `es_zhensi` (bool),
+`id`, `nombre`, `usuario`, `contrasena_hash`, `es_zhensi` (bool),
 `es_admin` (bool), `activo` (bool), `creado_en`
+
+`usuario` es un nombre de acceso corto que asigna el admin al crear la cuenta.
+**No se guarda ningún correo electrónico de zhensis ni de admin.** El sistema
+no envía correos, así que el dato no hace falta, y no guardarlo es la forma más
+segura de que no se pueda filtrar.
 
 ### perfil_zhensi
 `usuario_id`, `foto_url`, `carrera_id`, `semestre`, `descripcion_corta`
