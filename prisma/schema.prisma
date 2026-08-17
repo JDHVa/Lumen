@@ -70,6 +70,13 @@ model perfil_zhensi {
   descripcion_corta String? @db.VarChar(200)
   visible_publico   Boolean @default(false)
 
+  instagram String?
+  whatsapp  String?
+  facebook  String?
+  linkedin  String?
+  github    String?
+  tiktok    String?
+
   usuario usuario  @relation(fields: [usuario_id], references: [id], onDelete: Cascade)
   carrera carrera? @relation(fields: [carrera_id], references: [id])
 

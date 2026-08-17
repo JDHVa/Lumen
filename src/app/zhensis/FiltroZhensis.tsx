@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import { Campo } from "@/components/ui/Campo";
 import { Selector } from "@/components/ui/Selector";
 import { Tarjeta } from "@/components/ui/Tarjeta";
@@ -84,7 +85,11 @@ export function FiltroZhensis({
         <ul className="grid gap-4 sm:grid-cols-2">
           {visibles.map((zhenshi) => (
             <li key={zhenshi.id}>
-              <Tarjeta elevada className="flex h-full flex-col gap-4 p-5">
+              <Link href={`/zhensis/${zhenshi.id}`} className="block h-full">
+              <Tarjeta
+                elevada
+                className="flex h-full flex-col gap-4 p-5 transition-colors hover:border-marino/40"
+              >
                 <div className="flex items-center gap-3">
                   {zhenshi.foto ? (
                     <img
@@ -126,6 +131,7 @@ export function FiltroZhensis({
                   ))}
                 </div>
               </Tarjeta>
+              </Link>
             </li>
           ))}
         </ul>

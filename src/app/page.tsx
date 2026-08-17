@@ -60,7 +60,13 @@ export default async function PaginaInicio() {
       hora_inicio: true,
       salon: true,
       notas_publicas: true,
-      zhensi: { select: { nombre: true } },
+      zhensi: {
+        select: {
+          id: true,
+          nombre: true,
+          perfil: { select: { visible_publico: true } },
+        },
+      },
     },
   });
 
@@ -160,7 +166,18 @@ export default async function PaginaInicio() {
                             {sesion.titulo}
                           </span>
                           <span className="text-sm text-tinta-suave">
-                            Con {sesion.zhensi.nombre} · {sesion.salon}
+                            Con{" "}
+                            {sesion.zhensi.perfil?.visible_publico ? (
+                              <Link
+                                href={`/zhensis/${sesion.zhensi.id}`}
+                                className="font-medium text-marino underline underline-offset-4 hover:text-marino-claro"
+                              >
+                                {sesion.zhensi.nombre}
+                              </Link>
+                            ) : (
+                              sesion.zhensi.nombre
+                            )}{" "}
+                            · {sesion.salon}
                           </span>
                           {sesion.notas_publicas ? (
                             <span className="text-sm text-tinta-suave">

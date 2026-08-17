@@ -30,6 +30,12 @@ export async function cargarDatosPerfil(usuarioId: string) {
         semestre: true,
         descripcion_corta: true,
         visible_publico: true,
+        instagram: true,
+        whatsapp: true,
+        facebook: true,
+        linkedin: true,
+        github: true,
+        tiktok: true,
       },
     }),
     db.zhensi_materia.findMany({

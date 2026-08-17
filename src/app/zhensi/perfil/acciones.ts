@@ -9,6 +9,7 @@ import {
   TIPOS_FOTO,
   LIMITE_FOTO,
 } from "@/lib/almacenamiento";
+import { REDES, normalizarRed } from "@/lib/redes";
 
 export type EstadoPerfil = { error?: string; exito?: string };
 
@@ -82,6 +83,18 @@ export async function guardarPerfil(
     foto_url = subida.url;
   }
 
+  const redes: Record<string, string | null> = {};
+  for (const red of REDES) {
+    const resultado = normalizarRed(
+      red.clave,
+      String(datos.get(red.clave) ?? ""),
+    );
+    if (!resultado.ok) {
+      return { error: `${red.nombre}: ${resultado.error}` };
+    }
+    redes[red.clave] = resultado.valor;
+  }
+
   const elegidas = datos.getAll("materia").map((valor) => String(valor));
 
   const validas =
@@ -109,6 +122,7 @@ export async function guardarPerfil(
         descripcion_corta: descripcion || null,
         visible_publico,
         foto_url,
+        ...redes,
       },
       update: {
         carrera_id,
@@ -116,6 +130,7 @@ export async function guardarPerfil(
         descripcion_corta: descripcion || null,
         visible_publico,
         foto_url,
+        ...redes,
       },
     }),
     db.zhensi_materia.deleteMany({ where: { usuario_id } }),

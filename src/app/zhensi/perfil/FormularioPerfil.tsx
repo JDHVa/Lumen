@@ -9,6 +9,7 @@ import { Seccion } from "@/components/ui/Seccion";
 import { Tarjeta } from "@/components/ui/Tarjeta";
 import type { CarreraLista, MateriaLista } from "@/app/admin/catalogo/tipos";
 import { Iniciales } from "@/components/Iniciales";
+import { REDES, comoSeLee } from "@/lib/redes";
 import { SelectorMaterias } from "./SelectorMaterias";
 import { guardarPerfil, type EstadoPerfil } from "./acciones";
 
@@ -17,6 +18,12 @@ const LIMITE = 200;
 
 export type PerfilGuardado = {
   foto_url?: string | null;
+  instagram?: string | null;
+  whatsapp?: string | null;
+  facebook?: string | null;
+  linkedin?: string | null;
+  github?: string | null;
+  tiktok?: string | null;
   carrera_id: string | null;
   semestre: number | null;
   descripcion_corta: string | null;
@@ -189,6 +196,38 @@ export function FormularioPerfil({
               alCambiarVista={setCarreraVista}
             />
           )}
+        </Tarjeta>
+      </Seccion>
+
+      <Seccion
+        titulo="Tus redes"
+        descripcion="Todas son opcionales. Solo se muestran si decides aparecer en la galería."
+      >
+        <Tarjeta elevada className="flex flex-col gap-5 p-6">
+          <Aviso tono="neutral">
+            Esto queda a la vista de cualquiera que entre al sitio, no solo de
+            tu escuela. Pon únicamente lo que no te importe que sea público.
+          </Aviso>
+
+          <div className="grid gap-5 sm:grid-cols-2">
+            {REDES.map((red) => (
+              <Campo
+                key={red.clave}
+                etiqueta={red.nombre}
+                name={red.clave}
+                defaultValue={
+                  perfil?.[red.clave]
+                    ? comoSeLee(red.clave, perfil[red.clave] as string)
+                    : ""
+                }
+                placeholder={red.ejemplo}
+                ayuda={red.ayuda}
+                autoCapitalize="none"
+                autoCorrect="off"
+                spellCheck={false}
+              />
+            ))}
+          </div>
         </Tarjeta>
       </Seccion>
 
