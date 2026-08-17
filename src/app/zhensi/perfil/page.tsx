@@ -24,6 +24,7 @@ export default async function PaginaPerfil() {
 
       <FormularioPerfil
         usuarioId={sesion.user.id}
+        nombre={sesion.user.nombre}
         perfil={datos.perfil}
         carreras={datos.carreras}
         materias={datos.materias}

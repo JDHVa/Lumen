@@ -25,6 +25,7 @@ export async function cargarDatosPerfil(usuarioId: string) {
     db.perfil_zhensi.findUnique({
       where: { usuario_id: usuarioId },
       select: {
+        foto_url: true,
         carrera_id: true,
         semestre: true,
         descripcion_corta: true,

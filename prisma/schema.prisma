@@ -64,6 +64,7 @@ model usuario {
 model perfil_zhensi {
   usuario_id        String  @id
   foto_url          String?
+
   carrera_id        String?
   semestre          Int?
   descripcion_corta String? @db.VarChar(200)
@@ -203,6 +204,8 @@ model apunte {
   generacion  String?
   archivo_url String
   aprobado    Boolean  @default(false)
+  rechazado   Boolean  @default(false)
+  motivo      String?
   aprobado_por String?
   creado_en   DateTime @default(now())
 

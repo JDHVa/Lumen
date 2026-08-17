@@ -23,6 +23,7 @@ export default async function PaginaZhensis() {
         nombre: true,
         perfil: {
           select: {
+            foto_url: true,
             semestre: true,
             descripcion_corta: true,
             carrera_id: true,
@@ -43,6 +44,7 @@ export default async function PaginaZhensis() {
   const zhenshis: ZhenshiVista[] = cuentas.map((cuenta) => ({
     id: cuenta.id,
     nombre: cuenta.nombre,
+    foto: cuenta.perfil?.foto_url ?? null,
     semestre: cuenta.perfil?.semestre ?? null,
     descripcion: cuenta.perfil?.descripcion_corta ?? null,
     carreraId: cuenta.perfil?.carrera_id ?? null,

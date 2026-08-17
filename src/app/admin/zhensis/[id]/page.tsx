@@ -80,6 +80,7 @@ export default async function PaginaZhensiAdmin({
 
       <FormularioPerfil
         usuarioId={zhensi.id}
+        nombre={zhensi.nombre}
         perfil={datos.perfil}
         carreras={datos.carreras}
         materias={datos.materias}

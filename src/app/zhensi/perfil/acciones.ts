@@ -3,6 +3,12 @@
 import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
+import {
+  subirArchivo,
+  borrarArchivo,
+  TIPOS_FOTO,
+  LIMITE_FOTO,
+} from "@/lib/almacenamiento";
 
 export type EstadoPerfil = { error?: string; exito?: string };
 
@@ -50,6 +56,26 @@ export async function guardarPerfil(
 
   const visible_publico = datos.get("visible_publico") === "on";
 
+  const previo = await db.perfil_zhensi.findUnique({
+    where: { usuario_id },
+    select: { foto_url: true },
+  });
+
+  let foto_url = previo?.foto_url ?? null;
+
+  if (datos.get("quitar_foto") === "on") {
+    if (foto_url) await borrarArchivo(foto_url);
+    foto_url = null;
+  }
+
+  const foto = datos.get("foto");
+  if (foto instanceof File && foto.size > 0) {
+    const subida = await subirArchivo(foto, "fotos", TIPOS_FOTO, LIMITE_FOTO);
+    if (!subida.ok) return { error: subida.error };
+    if (foto_url) await borrarArchivo(foto_url);
+    foto_url = subida.url;
+  }
+
   const elegidas = datos.getAll("materia").map((valor) => String(valor));
 
   const validas =
@@ -76,12 +102,14 @@ export async function guardarPerfil(
         semestre,
         descripcion_corta: descripcion || null,
         visible_publico,
+        foto_url,
       },
       update: {
         carrera_id,
         semestre,
         descripcion_corta: descripcion || null,
         visible_publico,
+        foto_url,
       },
     }),
     db.zhensi_materia.deleteMany({ where: { usuario_id } }),

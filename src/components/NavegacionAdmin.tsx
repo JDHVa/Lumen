@@ -11,6 +11,7 @@ const enlaces = [
   { href: "/admin/sesiones", texto: "Sesiones" },
   { href: "/admin/solicitudes", texto: "Solicitudes" },
   { href: "/admin/buzon", texto: "Buzón" },
+  { href: "/admin/apuntes", texto: "Apuntes" },
   { href: "/admin/catalogo", texto: "Catálogo" },
   { href: "/admin/zhensis", texto: "Zhenshis" },
 ];

@@ -8,6 +8,7 @@ import { Selector, AreaTexto } from "@/components/ui/Selector";
 import { Seccion } from "@/components/ui/Seccion";
 import { Tarjeta } from "@/components/ui/Tarjeta";
 import type { CarreraLista, MateriaLista } from "@/app/admin/catalogo/tipos";
+import { Iniciales } from "@/components/Iniciales";
 import { SelectorMaterias } from "./SelectorMaterias";
 import { guardarPerfil, type EstadoPerfil } from "./acciones";
 
@@ -15,6 +16,7 @@ const estadoInicial: EstadoPerfil = {};
 const LIMITE = 200;
 
 export type PerfilGuardado = {
+  foto_url?: string | null;
   carrera_id: string | null;
   semestre: number | null;
   descripcion_corta: string | null;
@@ -23,12 +25,14 @@ export type PerfilGuardado = {
 
 export function FormularioPerfil({
   usuarioId,
+  nombre,
   perfil,
   carreras,
   materias,
   materiasElegidas,
 }: {
   usuarioId: string;
+  nombre: string;
   perfil: PerfilGuardado | null;
   carreras: CarreraLista[];
   materias: MateriaLista[];
@@ -106,6 +110,36 @@ export function FormularioPerfil({
               placeholder="Opcional"
             />
           </div>
+
+          <div className="flex flex-wrap items-center gap-4">
+            {perfil?.foto_url ? (
+              <img
+                src={perfil.foto_url}
+                alt="Tu foto"
+                className="size-16 shrink-0 rounded-full object-cover"
+              />
+            ) : (
+              <Iniciales nombre={nombre} grande />
+            )}
+            <div className="min-w-[14rem] flex-1">
+              <Campo
+                etiqueta="Tu foto"
+                name="foto"
+                type="file"
+                accept=".jpg,.jpeg,.png,.webp"
+                className="py-2.5 file:mr-3 file:rounded-suave file:border-0 file:bg-marino file:px-3 file:py-2 file:text-sm file:font-medium file:text-white"
+                ayuda="Opcional, máximo 3 MB. Si no subes ninguna se quedan tus iniciales."
+              />
+            </div>
+          </div>
+
+          {perfil?.foto_url ? (
+            <Casilla
+              name="quitar_foto"
+              etiqueta="Quitar mi foto"
+              ayuda="Se borra al guardar y vuelven tus iniciales."
+            />
+          ) : null}
 
           <AreaTexto
             etiqueta="Así explico yo"

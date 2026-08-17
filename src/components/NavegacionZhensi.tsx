@@ -8,6 +8,7 @@ const enlaces = [
   { href: "/zhensi/perfil", texto: "Mi perfil" },
   { href: "/zhensi/disponibilidad", texto: "Mi disponibilidad" },
   { href: "/zhensi/sesiones", texto: "Mis sesiones" },
+  { href: "/zhensi/apuntes", texto: "Mis apuntes" },
 ];
 
 export function NavegacionZhensi() {

@@ -3,7 +3,6 @@ import { Tarjeta } from "@/components/ui/Tarjeta";
 import { Etiqueta } from "@/components/ui/Etiqueta";
 
 const pendientes: { titulo: string; fase: string }[] = [
-  { titulo: "Apuntes", fase: "Fase 8" },
 ];
 
 export default function PaginaAdmin() {
@@ -76,6 +75,16 @@ export default function PaginaAdmin() {
             </p>
           </div>
           <BotonEnlace href="/admin/buzon">Abrir</BotonEnlace>
+        </Tarjeta>
+
+        <Tarjeta elevada className="flex flex-wrap items-center justify-between gap-4">
+          <div className="flex flex-col gap-1">
+            <h2 className="text-xl font-semibold">Apuntes</h2>
+            <p className="text-sm text-tinta-suave">
+              Revisa y aprueba lo que suben los zhenshis.
+            </p>
+          </div>
+          <BotonEnlace href="/admin/apuntes">Abrir</BotonEnlace>
         </Tarjeta>
 
         <Tarjeta elevada className="flex flex-wrap items-center justify-between gap-4">

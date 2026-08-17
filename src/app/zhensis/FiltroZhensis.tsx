@@ -10,6 +10,7 @@ import { Iniciales } from "@/components/Iniciales";
 export type ZhenshiVista = {
   id: string;
   nombre: string;
+  foto: string | null;
   semestre: number | null;
   descripcion: string | null;
   carreraId: string | null;
@@ -85,7 +86,15 @@ export function FiltroZhensis({
             <li key={zhenshi.id}>
               <Tarjeta elevada className="flex h-full flex-col gap-4 p-5">
                 <div className="flex items-center gap-3">
-                  <Iniciales nombre={zhenshi.nombre} grande />
+                  {zhenshi.foto ? (
+                    <img
+                      src={zhenshi.foto}
+                      alt={zhenshi.nombre}
+                      className="size-16 shrink-0 rounded-full object-cover"
+                    />
+                  ) : (
+                    <Iniciales nombre={zhenshi.nombre} grande />
+                  )}
                   <div className="flex min-w-0 flex-col gap-0.5">
                     <span className="font-titulos text-xl font-semibold text-marino">
                       {zhenshi.nombre}
