@@ -6,10 +6,7 @@ import { Etiqueta } from "@/components/ui/Etiqueta";
 
 export const dynamic = "force-dynamic";
 
-const pendientes = [
-  { titulo: "Mis sesiones", fase: "Fase 4" },
-  { titulo: "Subir apuntes", fase: "Fase 8" },
-];
+const pendientes = [{ titulo: "Subir apuntes", fase: "Fase 8" }];
 
 export default async function PaginaZhensi() {
   const sesion = await auth();

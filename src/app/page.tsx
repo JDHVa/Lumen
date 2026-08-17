@@ -4,7 +4,15 @@ import { Tarjeta } from "@/components/ui/Tarjeta";
 import { Etiqueta } from "@/components/ui/Etiqueta";
 import { EncabezadoPublico } from "@/components/EncabezadoPublico";
 import { PiePublico } from "@/components/PiePublico";
-import { MODALIDAD_EN_LINEA } from "@/lib/horarios";
+import {
+  MODALIDAD_EN_LINEA,
+  etiquetaDeBloque,
+  esEnLinea,
+} from "@/lib/horarios";
+import { diaSemanaDe, fechaLegible } from "@/lib/fechas";
+import { db } from "@/lib/db";
+
+export const dynamic = "force-dynamic";
 
 const pasos = [
   {
@@ -33,7 +41,27 @@ const pasos = [
   },
 ];
 
-export default function PaginaInicio() {
+export default async function PaginaInicio() {
+  const hoy = new Date();
+  const desde = new Date(
+    Date.UTC(hoy.getFullYear(), hoy.getMonth(), hoy.getDate()),
+  );
+
+  const proximas = await db.sesion.findMany({
+    where: { estado: "publicada", fecha: { gte: desde } },
+    orderBy: [{ fecha: "asc" }, { hora_inicio: "asc" }],
+    take: 8,
+    select: {
+      id: true,
+      titulo: true,
+      fecha: true,
+      hora_inicio: true,
+      salon: true,
+      notas_publicas: true,
+      zhensi: { select: { nombre: true } },
+    },
+  });
+
   return (
     <div className="flex min-h-screen flex-col">
       <EncabezadoPublico />
@@ -70,19 +98,58 @@ export default function PaginaInicio() {
 
         <section className="mx-auto max-w-5xl px-5 py-8">
           <div className="flex flex-wrap items-end justify-between gap-3 pb-5">
-            <h2 className="text-2xl font-semibold">Sesiones de esta semana</h2>
-            <Etiqueta tono="apagado">Llega en la fase 5</Etiqueta>
+            <h2 className="text-2xl font-semibold">Próximas sesiones</h2>
           </div>
-          <Tarjeta className="flex flex-col items-center gap-3 py-12 text-center">
-            <p className="max-w-sm leading-relaxed text-tinta-suave">
-              Aquí van a aparecer las sesiones ya agendadas, con la materia, el
-              zhenshi que la da, el día, la hora y el salón.
-            </p>
-            <p className="max-w-sm leading-relaxed text-tinta-suave">
-              Entre semana son presenciales, de 12 a 6 de la tarde.{" "}
-              <strong className="text-marino">{MODALIDAD_EN_LINEA}</strong>
-            </p>
-          </Tarjeta>
+
+          {proximas.length === 0 ? (
+            <Tarjeta className="flex flex-col items-center gap-3 py-12 text-center">
+              <p className="max-w-sm leading-relaxed text-tinta-suave">
+                Ahorita no hay ninguna sesión agendada. Pide ayuda y en cuanto
+                se junte gente se agenda una.
+              </p>
+              <p className="max-w-sm leading-relaxed text-tinta-suave">
+                Entre semana son presenciales, de 12 a 6 de la tarde.{" "}
+                <strong className="text-marino">{MODALIDAD_EN_LINEA}</strong>
+              </p>
+            </Tarjeta>
+          ) : (
+            <ul className="grid gap-4 sm:grid-cols-2">
+              {proximas.map((sesion) => {
+                const dia = diaSemanaDe(sesion.fecha);
+                return (
+                  <li key={sesion.id}>
+                    <Tarjeta
+                      elevada
+                      className="flex h-full flex-col gap-2 p-5 text-left"
+                    >
+                      <div className="flex flex-wrap items-center gap-2">
+                        <Etiqueta tono="marino">
+                          {fechaLegible(sesion.fecha)}
+                        </Etiqueta>
+                        <Etiqueta tono="apagado">
+                          {etiquetaDeBloque(dia, sesion.hora_inicio)}
+                        </Etiqueta>
+                        {esEnLinea(dia) ? (
+                          <Etiqueta tono="dorado">en línea</Etiqueta>
+                        ) : null}
+                      </div>
+                      <span className="font-titulos text-xl font-semibold text-marino">
+                        {sesion.titulo}
+                      </span>
+                      <span className="text-sm text-tinta-suave">
+                        Con {sesion.zhensi.nombre} · {sesion.salon}
+                      </span>
+                      {sesion.notas_publicas ? (
+                        <span className="text-sm text-tinta-suave">
+                          {sesion.notas_publicas}
+                        </span>
+                      ) : null}
+                    </Tarjeta>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
         </section>
 
         <section className="mx-auto max-w-5xl px-5 py-8">
