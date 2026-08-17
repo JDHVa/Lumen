@@ -214,8 +214,8 @@ export default async function PaginaInicio() {
             </h2>
             <p className="mx-auto max-w-lg pt-3 leading-relaxed text-white/80">
               Los zhenshis son alumnos que dan sesiones de apoyo a sus
-              compañeros. Si te interesa entrarle, escríbenos y te damos tu
-              cuenta.
+              compañeros. Si te interesa entrarle, escríbenos y te contactaremos
+              pronto.
             </p>
             <div className="flex flex-col justify-center gap-3 pt-6 sm:flex-row">
               <BotonEnlace href="/zhensis" variante="principal">

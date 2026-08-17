@@ -90,7 +90,7 @@ export default async function PaginaZhensis() {
             </h2>
             <p className="mx-auto max-w-lg pt-3 leading-relaxed text-white/80">
               Si hay una materia que se te da bien y no te da flojera
-              explicarla, escríbenos y te damos tu cuenta.
+              explicarla, escríbenos y te contactaremos pronto.
             </p>
             <div className="flex flex-col justify-center gap-3 pt-6 sm:flex-row">
               <BotonEnlace
