@@ -7,6 +7,53 @@ import { db } from "@/lib/db";
 
 export type EstadoAlta = { error?: string; exito?: string };
 
+export async function cambiarContrasena(
+  _estado: EstadoAlta,
+  datos: FormData,
+): Promise<EstadoAlta> {
+  const sesion = await auth();
+  if (!sesion?.user.es_admin) {
+    return { error: "No tienes permiso para hacer esto." };
+  }
+
+  const id = String(datos.get("id") ?? "");
+  const contrasena = String(datos.get("contrasena") ?? "");
+  const repetida = String(datos.get("repetida") ?? "");
+
+  if (!id) return { error: "Falta la cuenta." };
+
+  if (contrasena.length < 8) {
+    return { error: "La contraseña debe tener al menos 8 caracteres." };
+  }
+
+  if (contrasena !== repetida) {
+    return { error: "Las dos contraseñas no son iguales." };
+  }
+
+  const cuenta = await db.usuario.findUnique({
+    where: { id },
+    select: { id: true, nombre: true },
+  });
+
+  if (!cuenta) return { error: "Esa cuenta ya no existe." };
+
+  await db.usuario.update({
+    where: { id },
+    data: { contrasena_hash: await bcrypt.hash(contrasena, 12) },
+  });
+
+  await db.intento_acceso.deleteMany({ where: { logrado: false } });
+
+  revalidatePath("/admin/usuarios");
+
+  return {
+    exito:
+      cuenta.id === sesion.user.id
+        ? "Cambiaste tu propia contraseña. Anótala."
+        : `Contraseña cambiada. Entrégasela a ${cuenta.nombre} en persona.`,
+  };
+}
+
 export async function crearUsuario(
   _estado: EstadoAlta,
   datos: FormData,

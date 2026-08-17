@@ -2,11 +2,15 @@ import { db } from "@/lib/db";
 import { Tarjeta } from "@/components/ui/Tarjeta";
 import { Etiqueta } from "@/components/ui/Etiqueta";
 import { Seccion } from "@/components/ui/Seccion";
+import { auth } from "@/lib/auth";
 import { FormularioAlta } from "./FormularioAlta";
+import { CambioContrasena } from "./CambioContrasena";
 
 export const dynamic = "force-dynamic";
 
 export default async function PaginaUsuarios() {
+  const sesion = await auth();
+
   const cuentas = await db.usuario.findMany({
     orderBy: { creado_en: "asc" },
     select: {
@@ -49,26 +53,34 @@ export default async function PaginaUsuarios() {
           <ul className="flex flex-col gap-2.5">
             {cuentas.map((cuenta) => (
               <li key={cuenta.id}>
-                <Tarjeta className="flex flex-wrap items-center gap-x-3 gap-y-2 py-4">
-                  <div className="flex min-w-0 flex-col">
-                    <span className="truncate font-medium text-marino">
-                      {cuenta.nombre}
-                    </span>
-                    <span className="truncate text-sm text-tinta-suave">
-                      {cuenta.usuario}
-                    </span>
+                <Tarjeta className="flex flex-col gap-3 py-4">
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+                    <div className="flex min-w-0 flex-col">
+                      <span className="truncate font-medium text-marino">
+                        {cuenta.nombre}
+                      </span>
+                      <span className="truncate text-sm text-tinta-suave">
+                        {cuenta.usuario}
+                      </span>
+                    </div>
+                    <div className="ml-auto flex flex-wrap items-center gap-1.5">
+                      {cuenta.es_zhensi ? (
+                        <Etiqueta tono="marino">zhenshi</Etiqueta>
+                      ) : null}
+                      {cuenta.es_admin ? (
+                        <Etiqueta tono="dorado">admin</Etiqueta>
+                      ) : null}
+                      {!cuenta.activo ? (
+                        <Etiqueta tono="alerta">inactivo</Etiqueta>
+                      ) : null}
+                    </div>
                   </div>
-                  <div className="ml-auto flex flex-wrap items-center gap-1.5">
-                    {cuenta.es_zhensi ? (
-                      <Etiqueta tono="marino">zhenshi</Etiqueta>
-                    ) : null}
-                    {cuenta.es_admin ? (
-                      <Etiqueta tono="dorado">admin</Etiqueta>
-                    ) : null}
-                    {!cuenta.activo ? (
-                      <Etiqueta tono="alerta">inactivo</Etiqueta>
-                    ) : null}
-                  </div>
+
+                  <CambioContrasena
+                    id={cuenta.id}
+                    nombre={cuenta.nombre}
+                    esTuya={cuenta.id === sesion?.user.id}
+                  />
                 </Tarjeta>
               </li>
             ))}
