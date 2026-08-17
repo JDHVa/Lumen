@@ -38,6 +38,20 @@ export async function guardarPerfil(
   });
 
   const llegoCarrera = datos.has("carrera_id");
+  const nombre = String(datos.get("nombre") ?? "").trim().replace(/\s+/g, " ");
+
+  if (nombre.length < 3) {
+    return { error: "Tu nombre debe tener al menos 3 letras." };
+  }
+  if (nombre.length > 80) {
+    return { error: "Ese nombre es demasiado largo." };
+  }
+  if (!/^[\p{L}\p{M}'.\- ]+$/u.test(nombre)) {
+    return {
+      error: "El nombre solo puede llevar letras, espacios, guiones y apóstrofos.",
+    };
+  }
+
   const carreraCruda = String(datos.get("carrera_id") ?? "").trim();
 
   const carrera_id = !llegoCarrera
@@ -113,6 +127,7 @@ export async function guardarPerfil(
   }
 
   await db.$transaction([
+    db.usuario.update({ where: { id: usuario_id }, data: { nombre } }),
     db.perfil_zhensi.upsert({
       where: { usuario_id },
       create: {
@@ -142,7 +157,7 @@ export async function guardarPerfil(
     }),
   ]);
 
-  revalidatePath("/zhensi/perfil");
+  revalidatePath("/zhensi", "layout");
   revalidatePath("/admin/zhensis");
   revalidatePath(`/admin/zhensis/${usuario_id}`);
   revalidatePath("/zhensis");

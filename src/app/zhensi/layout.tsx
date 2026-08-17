@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { BarraSesion } from "@/components/BarraSesion";
 import { NavegacionZhensi } from "@/components/NavegacionZhensi";
+import { nombreActual } from "@/lib/cuenta";
 
 export default async function LayoutZhensi({
   children,
@@ -15,7 +16,7 @@ export default async function LayoutZhensi({
   return (
     <div className="flex min-h-screen flex-col">
       <BarraSesion
-        nombre={sesion.user.nombre}
+        nombre={await nombreActual(sesion.user.id, sesion.user.nombre)}
         esAdmin={sesion.user.es_admin}
         zona="zhensi"
       />

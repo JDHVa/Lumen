@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { FormularioPerfil } from "./FormularioPerfil";
 import { cargarDatosPerfil } from "./datos";
+import { nombreActual } from "@/lib/cuenta";
 
 export const dynamic = "force-dynamic";
 
@@ -24,7 +25,7 @@ export default async function PaginaPerfil() {
 
       <FormularioPerfil
         usuarioId={sesion.user.id}
-        nombre={sesion.user.nombre}
+        nombre={await nombreActual(sesion.user.id, sesion.user.nombre)}
         perfil={datos.perfil}
         carreras={datos.carreras}
         materias={datos.materias}

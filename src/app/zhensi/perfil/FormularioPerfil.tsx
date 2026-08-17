@@ -55,6 +55,7 @@ export function FormularioPerfil({
   const [descripcion, setDescripcion] = useState(
     perfil?.descripcion_corta ?? "",
   );
+  const [nombreEscrito, setNombreEscrito] = useState(nombre);
   const [carreraId, setCarreraId] = useState(perfil?.carrera_id ?? "");
   const [semestre, setSemestre] = useState(
     perfil?.semestre ? String(perfil.semestre) : "",
@@ -70,10 +71,11 @@ export function FormularioPerfil({
 
   useEffect(() => {
     if (!estado.exito) return;
+    setNombreEscrito(nombre);
     setCarreraId(perfil?.carrera_id ?? "");
     setSemestre(perfil?.semestre ? String(perfil.semestre) : "");
     setDescripcion(perfil?.descripcion_corta ?? "");
-  }, [estado.exito, perfil]);
+  }, [estado.exito, perfil, nombre]);
 
   function alternarMateria(id: string) {
     setSeleccionadas((previa) => {
@@ -98,6 +100,16 @@ export function FormularioPerfil({
         descripcion="Esto es lo que va a ver la gente en la galería si decides aparecer."
       >
         <Tarjeta elevada className="flex flex-col gap-5 p-6">
+          <Campo
+            etiqueta="Tu nombre"
+            name="nombre"
+            required
+            maxLength={80}
+            value={nombreEscrito}
+            onChange={(evento) => setNombreEscrito(evento.target.value)}
+            ayuda="Así te va a ver la gente en la galería y en las sesiones que des."
+          />
+
           <div className="grid gap-5 sm:grid-cols-[1fr_9rem]">
             <Selector
               etiqueta="Tu carrera"
@@ -133,7 +145,7 @@ export function FormularioPerfil({
                 className="size-16 shrink-0 rounded-full object-cover"
               />
             ) : (
-              <Iniciales nombre={nombre} grande />
+              <Iniciales nombre={nombreEscrito || nombre} grande />
             )}
             <div className="min-w-[14rem] flex-1">
               <Campo

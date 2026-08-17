@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { BotonEnlace } from "@/components/ui/Boton";
 import { Tarjeta } from "@/components/ui/Tarjeta";
 import { Etiqueta } from "@/components/ui/Etiqueta";
+import { nombreActual } from "@/lib/cuenta";
 
 export const dynamic = "force-dynamic";
 
@@ -47,7 +48,7 @@ export default async function PaginaZhensi() {
   return (
     <div className="flex flex-col gap-7">
       <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-bold">Hola, {sesion.user.nombre}</h1>
+        <h1 className="text-3xl font-bold">Hola, {await nombreActual(sesion.user.id, sesion.user.nombre)}</h1>
         <p className="leading-relaxed text-tinta-suave">
           Esta es tu vista de zhenshi. Aquí vas a llevar tu disponibilidad, tus
           sesiones y tu perfil.
