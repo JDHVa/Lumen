@@ -44,6 +44,18 @@ export function FormularioPerfil({
   const [descripcion, setDescripcion] = useState(
     perfil?.descripcion_corta ?? "",
   );
+  const [carreraId, setCarreraId] = useState(perfil?.carrera_id ?? "");
+  const [semestre, setSemestre] = useState(
+    perfil?.semestre ? String(perfil.semestre) : "",
+  );
+  const [carreraVista, setCarreraVista] = useState(
+    perfil?.carrera_id ?? carreras[0]?.id ?? "",
+  );
+
+  function cambiarCarrera(id: string) {
+    setCarreraId(id);
+    if (id) setCarreraVista(id);
+  }
 
   function alternarMateria(id: string) {
     setSeleccionadas((previa) => {
@@ -72,7 +84,8 @@ export function FormularioPerfil({
             <Selector
               etiqueta="Tu carrera"
               name="carrera_id"
-              defaultValue={perfil?.carrera_id ?? ""}
+              value={carreraId}
+              onChange={(evento) => cambiarCarrera(evento.target.value)}
             >
               <option value="">Sin especificar</option>
               {carreras.map((carrera) => (
@@ -88,7 +101,8 @@ export function FormularioPerfil({
               type="number"
               min={1}
               max={12}
-              defaultValue={perfil?.semestre ?? ""}
+              value={semestre}
+              onChange={(evento) => setSemestre(evento.target.value)}
               placeholder="Opcional"
             />
           </div>
@@ -130,6 +144,8 @@ export function FormularioPerfil({
               materias={materias}
               seleccionadas={seleccionadas}
               alCambiar={alternarMateria}
+              carreraVista={carreraVista}
+              alCambiarVista={setCarreraVista}
             />
           )}
         </Tarjeta>

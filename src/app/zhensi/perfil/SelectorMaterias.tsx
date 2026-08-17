@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { Tarjeta } from "@/components/ui/Tarjeta";
 import { Selector } from "@/components/ui/Selector";
 import type { CarreraLista, MateriaLista } from "@/app/admin/catalogo/tipos";
@@ -10,13 +10,16 @@ export function SelectorMaterias({
   materias,
   seleccionadas,
   alCambiar,
+  carreraVista,
+  alCambiarVista,
 }: {
   carreras: CarreraLista[];
   materias: MateriaLista[];
   seleccionadas: Set<string>;
   alCambiar: (id: string) => void;
+  carreraVista: string;
+  alCambiarVista: (id: string) => void;
 }) {
-  const [carreraVista, setCarreraVista] = useState(carreras[0]?.id ?? "");
 
   const tronco = useMemo(
     () => materias.filter((materia) => materia.carrera_id === null),
@@ -27,6 +30,19 @@ export function SelectorMaterias({
     () => materias.filter((materia) => materia.carrera_id === carreraVista),
     [materias, carreraVista],
   );
+
+  const marcadas = useMemo(() => {
+    const claves = new Map(
+      carreras.map((carrera) => [carrera.id, carrera.clave]),
+    );
+    return materias
+      .filter((materia) => seleccionadas.has(materia.id))
+      .map(
+        (materia) =>
+          `${materia.nombre} (${materia.carrera_id ? (claves.get(materia.carrera_id) ?? "?") : "tronco común"})`,
+      )
+      .sort((a, b) => a.localeCompare(b, "es"));
+  }, [materias, carreras, seleccionadas]);
 
   const grupos = [
     { titulo: "Tronco común", lista: tronco },
@@ -43,8 +59,8 @@ export function SelectorMaterias({
       <Selector
         etiqueta="Ver materias de"
         value={carreraVista}
-        onChange={(evento) => setCarreraVista(evento.target.value)}
-        ayuda="Puedes marcar materias de varias carreras. Lo que marques en una no se borra al cambiar de carrera."
+        onChange={(evento) => alCambiarVista(evento.target.value)}
+        ayuda="Arranca en tu carrera. Puedes marcar materias de otras: lo que marques en una no se borra al cambiar."
       >
         {carreras.map((carrera) => (
           <option key={carrera.id} value={carrera.id}>
@@ -52,6 +68,17 @@ export function SelectorMaterias({
           </option>
         ))}
       </Selector>
+
+      {marcadas.length > 0 ? (
+        <div className="rounded-suave border border-marino/15 bg-marino-tenue px-4 py-3">
+          <span className="text-sm font-semibold text-marino">
+            Lo que llevas marcado
+          </span>
+          <p className="pt-1 text-sm leading-relaxed text-tinta-suave">
+            {marcadas.join(" · ")}
+          </p>
+        </div>
+      ) : null}
 
       {grupos.map((grupo) => (
         <div key={grupo.titulo} className="flex flex-col gap-2">
