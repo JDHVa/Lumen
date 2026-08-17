@@ -1,9 +1,5 @@
 import { BotonEnlace } from "@/components/ui/Boton";
 import { Tarjeta } from "@/components/ui/Tarjeta";
-import { Etiqueta } from "@/components/ui/Etiqueta";
-
-const pendientes: { titulo: string; fase: string }[] = [
-];
 
 export default function PaginaAdmin() {
   return (
@@ -107,22 +103,6 @@ export default function PaginaAdmin() {
           <BotonEnlace href="/admin/zhensis">Abrir</BotonEnlace>
         </Tarjeta>
       </div>
-
-      <section className="flex flex-col gap-3">
-        <h2 className="text-xl font-semibold">Lo que falta</h2>
-        <ul className="grid gap-3 sm:grid-cols-2">
-          {pendientes.map((item) => (
-            <li key={item.titulo}>
-              <Tarjeta className="flex h-full items-center justify-between gap-3">
-                <span className="text-sm font-medium text-marino">
-                  {item.titulo}
-                </span>
-                <Etiqueta tono="apagado">{item.fase}</Etiqueta>
-              </Tarjeta>
-            </li>
-          ))}
-        </ul>
-      </section>
     </div>
   );
 }

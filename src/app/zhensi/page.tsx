@@ -6,8 +6,6 @@ import { Etiqueta } from "@/components/ui/Etiqueta";
 
 export const dynamic = "force-dynamic";
 
-const pendientes: { titulo: string; fase: string }[] = [];
-
 export default async function PaginaZhensi() {
   const sesion = await auth();
   if (!sesion?.user) return null;
@@ -90,18 +88,6 @@ export default async function PaginaZhensi() {
         </p>
       ) : null}
 
-      <ul className="grid gap-3 sm:grid-cols-2">
-        {pendientes.map((item) => (
-          <li key={item.titulo}>
-            <Tarjeta className="flex h-full items-center justify-between gap-3">
-              <span className="font-titulos text-lg font-semibold text-marino">
-                {item.titulo}
-              </span>
-              <Etiqueta tono="apagado">{item.fase}</Etiqueta>
-            </Tarjeta>
-          </li>
-        ))}
-      </ul>
     </div>
   );
 }
