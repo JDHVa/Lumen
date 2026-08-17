@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useEffect, useState } from "react";
 import { Boton } from "@/components/ui/Boton";
 import { Campo, Casilla } from "@/components/ui/Campo";
 import { Aviso } from "@/components/ui/Aviso";
@@ -60,6 +60,13 @@ export function FormularioPerfil({
     setCarreraId(id);
     if (id) setCarreraVista(id);
   }
+
+  useEffect(() => {
+    if (!estado.exito) return;
+    setCarreraId(perfil?.carrera_id ?? "");
+    setSemestre(perfil?.semestre ? String(perfil.semestre) : "");
+    setDescripcion(perfil?.descripcion_corta ?? "");
+  }, [estado.exito, perfil]);
 
   function alternarMateria(id: string) {
     setSeleccionadas((previa) => {

@@ -31,8 +31,19 @@ export async function guardarPerfil(
     return { error: "Esa cuenta no es de un zhenshi." };
   }
 
-  const carreraCruda = String(datos.get("carrera_id") ?? "");
-  const carrera_id = carreraCruda === "" ? null : carreraCruda;
+  const guardado = await db.perfil_zhensi.findUnique({
+    where: { usuario_id },
+    select: { foto_url: true, carrera_id: true },
+  });
+
+  const llegoCarrera = datos.has("carrera_id");
+  const carreraCruda = String(datos.get("carrera_id") ?? "").trim();
+
+  const carrera_id = !llegoCarrera
+    ? (guardado?.carrera_id ?? null)
+    : carreraCruda === ""
+      ? null
+      : carreraCruda;
 
   if (carrera_id) {
     const existe = await db.carrera.findUnique({ where: { id: carrera_id } });
@@ -56,12 +67,7 @@ export async function guardarPerfil(
 
   const visible_publico = datos.get("visible_publico") === "on";
 
-  const previo = await db.perfil_zhensi.findUnique({
-    where: { usuario_id },
-    select: { foto_url: true },
-  });
-
-  let foto_url = previo?.foto_url ?? null;
+  let foto_url = guardado?.foto_url ?? null;
 
   if (datos.get("quitar_foto") === "on") {
     if (foto_url) await borrarArchivo(foto_url);
