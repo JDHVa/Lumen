@@ -64,7 +64,8 @@ proyecto, no solo etiquetas de la pantalla.
 
 **Para el zhenshi**
 
-- Perfil: carrera, semestre, foto, materias que puede dar y redes
+- Perfil: nombre, carrera, semestre, foto, materias que puede dar y redes
+- Cambiar su propia contraseña
 - Disponibilidad semanal en una cuadrícula
 - Sus sesiones asignadas y sus horas acumuladas
 - Subir apuntes
@@ -143,7 +144,7 @@ suele ser más útil que la lista de lo que sí hace.
 
 ## Lo que falta
 
-- No hay recuperación de contraseña por cuenta propia: un admin la cambia y la
+- No hay recuperación de contraseña si se olvida: un admin la cambia y la
   entrega en persona.
 - Cambiar una contraseña no cierra las sesiones ya abiertas.
 - El contador de apoyos se puede inflar borrando las cookies del navegador.

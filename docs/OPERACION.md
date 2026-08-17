@@ -111,9 +111,13 @@ En *Panel de admin → Usuarios*, cada cuenta trae el botón **Cambiar su
 contraseña**. Hay que escribirla dos veces, y el botón *Inventar una* genera
 una al azar sin letras que se confundan.
 
-**No hay recuperación por cuenta propia**: si alguien pierde la suya, un admin
-se la cambia y se la entrega en persona. Lumen no manda correos, así que no
-existe el "olvidé mi contraseña".
+Cada zhenshi también puede cambiar la suya desde *Mi perfil*, escribiendo la
+que usa ahorita. Un admin no necesita saber la anterior; el dueño de la cuenta
+sí, para que nadie que agarre un celular abierto pueda cambiarla.
+
+**No hay recuperación por cuenta propia**: si alguien la olvida, un admin se la
+cambia y se la entrega en persona. Lumen no manda correos, así que no existe el
+"olvidé mi contraseña".
 
 Cambiar la contraseña **no cierra las sesiones que ya estén abiertas**. Si el
 motivo es que alguien perdió su celular, hay que rotar además el `AUTH_SECRET`,

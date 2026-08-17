@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { FormularioPerfil } from "./FormularioPerfil";
 import { cargarDatosPerfil } from "./datos";
 import { nombreActual } from "@/lib/cuenta";
+import { MiContrasena } from "./MiContrasena";
 
 export const dynamic = "force-dynamic";
 
@@ -31,6 +32,8 @@ export default async function PaginaPerfil() {
         materias={datos.materias}
         materiasElegidas={datos.materiasElegidas}
       />
+
+      <MiContrasena />
     </div>
   );
 }
