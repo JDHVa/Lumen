@@ -3,10 +3,51 @@ src/generated/
 .next/
 out/
 build/
-.env
-.env*.local
 *.tsbuildinfo
 next-env.d.ts
-.DS_Store
-npm-debug.log*
+.vercel/
+
+# Variables de entorno: aquí viven todas las llaves.
+# Lo único que se sube es .env.example, con valores de mentira.
+.env
+.env.*
+!.env.example
+
+# Respaldos de la base. Traen las contraseñas cifradas de todas las
+# cuentas y los mensajes del buzón. Nunca deben subirse.
 respaldos/
+*.sql
+*.dump
+*.sqlite
+*.sqlite3
+*.db
+
+# Llaves y certificados
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+*.jks
+*.keystore
+credenciales*.json
+service-account*.json
+*serviceaccount*.json
+
+# Archivos temporales míos y de herramientas
+*-tmp.ts
+*-tmp.tsx
+tmp/
+temporal/
+.cache/
+
+# Basura del sistema y de los editores
+.DS_Store
+Thumbs.db
+desktop.ini
+*.log
+npm-debug.log*
+yarn-error.log*
+.idea/
+.vscode/*
+!.vscode/extensions.json
