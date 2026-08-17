@@ -36,7 +36,7 @@ export default async function PaginaDisponibilidad() {
         Entre semana las sesiones son presenciales, de 12 a 6 de la tarde, en
         bloques de una hora. {MODALIDAD_EN_LINEA} Van de 7 de la mañana a 7 de
         la noche en bloques de dos horas, y así se le va a mostrar al schüler
-        cuando vea el tablero.
+        cuando vea las sesiones.
       </Aviso>
 
       <Cuadricula marcados={marcados} />

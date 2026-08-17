@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 const enlaces = [
-  { href: "/tablero", texto: "Tablero" },
+  { href: "/tablero", texto: "Solicitudes" },
   { href: "/zhensis", texto: "Zhensis" },
   { href: "/apuntes", texto: "Apuntes" },
   { href: "/buzon", texto: "Buzón" },

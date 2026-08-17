@@ -29,7 +29,7 @@ const pasos = [
     numero: "4",
     titulo: "Llegas y ya",
     texto:
-      "Ves el día y el salón en el tablero. No hay lista, ni cupo, ni confirmación.",
+      "Ves el día y el salón aquí en el inicio. No hay lista, ni cupo, ni confirmación.",
   },
 ];
 
@@ -60,7 +60,7 @@ export default function PaginaInicio() {
               Pedir ayuda
             </BotonEnlace>
             <BotonEnlace href="/tablero" variante="contorno" tamano="grande">
-              Ver el tablero
+              Ver las solicitudes
             </BotonEnlace>
           </div>
           <p className="text-sm text-tinta-suave">

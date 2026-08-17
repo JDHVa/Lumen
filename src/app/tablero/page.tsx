@@ -107,7 +107,7 @@ export default async function PaginaTablero({
       <main className="mx-auto w-full max-w-3xl flex-1 px-5 py-10">
         <div className="flex flex-col gap-2 pb-7">
           <h1 className="text-3xl font-bold sm:text-4xl">
-            Lo que la banda está pidiendo
+            Lo que la gente está pidiendo
           </h1>
           <p className="leading-relaxed text-tinta-suave">
             Si alguien ya pidió lo que tú necesitas, no mandes otra solicitud:

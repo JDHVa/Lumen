@@ -22,7 +22,7 @@ export async function crearSolicitud(
   if (!tope.permitido) {
     return {
       error:
-        "Ya mandaste varias solicitudes en la última hora. Espera un rato antes de mandar otra, o busca la tuya en el tablero con tu código.",
+        "Ya mandaste varias solicitudes en la última hora. Espera un rato antes de mandar otra, o busca la tuya en la lista de solicitudes con tu código.",
     };
   }
 

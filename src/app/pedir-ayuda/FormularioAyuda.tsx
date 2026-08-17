@@ -57,7 +57,7 @@ export function FormularioAyuda({
         </span>
         <p className="max-w-sm leading-relaxed text-tinta-suave">
           Apunta ese código o toma una captura. Con él puedes buscar tu
-          solicitud en el tablero y ver si ya tiene fecha y salón.
+          solicitud en la lista y ver si ya tiene fecha y salón.
         </p>
         <div className="flex flex-col gap-3 sm:flex-row">
           <BotonEnlace href={`/tablero?codigo=${estado.codigo}`}>
