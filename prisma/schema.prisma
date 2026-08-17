@@ -172,6 +172,7 @@ model sesion {
   estado         estado_sesion @default(borrador)
   creada_por     String
   notas_publicas String?
+  creada_en      DateTime      @default(now())
 
   zhensi     usuario     @relation("sesion_zhensi", fields: [zhensi_id], references: [id])
   creador    usuario     @relation("sesion_creador", fields: [creada_por], references: [id])

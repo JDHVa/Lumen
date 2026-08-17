@@ -2,9 +2,7 @@ import { BotonEnlace } from "@/components/ui/Boton";
 import { Tarjeta } from "@/components/ui/Tarjeta";
 import { Etiqueta } from "@/components/ui/Etiqueta";
 
-const pendientes = [
-  { titulo: "Sesiones", fase: "Fase 4" },
-  { titulo: "Dashboard", fase: "Fase 6" },
+const pendientes: { titulo: string; fase: string }[] = [
   { titulo: "Buzón", fase: "Fase 7" },
   { titulo: "Apuntes", fase: "Fase 8" },
 ];
@@ -29,6 +27,16 @@ export default function PaginaAdmin() {
             </p>
           </div>
           <BotonEnlace href="/admin/usuarios">Abrir</BotonEnlace>
+        </Tarjeta>
+
+        <Tarjeta elevada className="flex flex-wrap items-center justify-between gap-4">
+          <div className="flex flex-col gap-1">
+            <h2 className="text-xl font-semibold">Dashboard</h2>
+            <p className="text-sm text-tinta-suave">
+              Los números: sesiones, horas y lo más pedido.
+            </p>
+          </div>
+          <BotonEnlace href="/admin/dashboard">Abrir</BotonEnlace>
         </Tarjeta>
 
         <Tarjeta elevada className="flex flex-wrap items-center justify-between gap-4">

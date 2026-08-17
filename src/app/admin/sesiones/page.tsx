@@ -6,6 +6,7 @@ import { etiquetaDeBloque } from "@/lib/horarios";
 import { diaSemanaDe, fechaLegible } from "@/lib/fechas";
 import { cambiarEstadoSesion } from "./acciones";
 import { FormularioSesion } from "./FormularioSesion";
+import { FormularioAsistencia } from "./FormularioAsistencia";
 
 export const dynamic = "force-dynamic";
 
@@ -33,6 +34,7 @@ export default async function PaginaSesiones() {
         zhensi: { select: { nombre: true } },
         creador: { select: { nombre: true } },
         solicitud: { select: { codigo_publico: true } },
+        asistencia: { select: { cantidad: true } },
       },
     }),
     db.usuario.findMany({
@@ -43,6 +45,14 @@ export default async function PaginaSesiones() {
   ]);
 
   const publicadas = sesiones.filter((s) => s.estado === "publicada").length;
+
+  const hoy = new Date();
+  const corte = new Date(
+    Date.UTC(hoy.getFullYear(), hoy.getMonth(), hoy.getDate()),
+  );
+  const porCapturar = sesiones.filter(
+    (s) => s.estado !== "cancelada" && s.fecha <= corte && !s.asistencia,
+  ).length;
 
   return (
     <div className="flex flex-col gap-8">
@@ -59,7 +69,7 @@ export default async function PaginaSesiones() {
 
       <Seccion
         titulo="Agenda"
-        descripcion={`${sesiones.length} en total, ${publicadas} publicadas.`}
+        descripcion={`${sesiones.length} en total, ${publicadas} publicadas${porCapturar > 0 ? `, ${porCapturar} ya pasaron y les falta capturar asistencia` : ""}.`}
       >
         {sesiones.length === 0 ? (
           <Tarjeta className="py-10 text-center text-sm text-tinta-suave">
@@ -105,7 +115,23 @@ export default async function PaginaSesiones() {
                     <span className="text-xs text-tinta-suave">
                       La agendó {sesion.creador.nombre}
                     </span>
+                    {sesion.asistencia ? (
+                      <span className="text-sm font-medium text-exito">
+                        {sesion.asistencia.cantidad === 0
+                          ? "No llegó nadie."
+                          : sesion.asistencia.cantidad === 1
+                            ? "Llegó 1 persona."
+                            : `Llegaron ${sesion.asistencia.cantidad} personas.`}
+                      </span>
+                    ) : null}
                   </div>
+
+                  {sesion.estado !== "cancelada" && sesion.fecha <= corte ? (
+                    <FormularioAsistencia
+                      sesionId={sesion.id}
+                      cantidadPrevia={sesion.asistencia?.cantidad ?? null}
+                    />
+                  ) : null}
 
                   {sesion.estado === "realizada" ? null : (
                     <div className="flex flex-wrap items-center gap-4">

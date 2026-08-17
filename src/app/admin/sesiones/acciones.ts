@@ -49,6 +49,64 @@ export async function cambiarEstadoSesion(datos: FormData) {
   refrescar();
 }
 
+export async function capturarAsistencia(
+  _estado: EstadoSesion,
+  datos: FormData,
+): Promise<EstadoSesion> {
+  const sesion = await auth();
+  if (!sesion?.user.es_admin) {
+    return { error: "No tienes permiso para hacer esto." };
+  }
+
+  const id = String(datos.get("id") ?? "");
+  const crudo = String(datos.get("cantidad") ?? "").trim();
+
+  if (!id) return { error: "Falta la sesión." };
+  if (crudo === "") return { error: "Escribe cuánta gente llegó." };
+
+  const cantidad = Number(crudo);
+  if (!Number.isInteger(cantidad) || cantidad < 0 || cantidad > 500) {
+    return { error: "La cantidad debe ser un número entero de 0 a 500." };
+  }
+
+  const encontrada = await db.sesion.findUnique({
+    where: { id },
+    select: { id: true, fecha: true, estado: true },
+  });
+  if (!encontrada) return { error: "Esa sesión ya no existe." };
+
+  if (encontrada.estado === "cancelada") {
+    return { error: "Esa sesión está cancelada. No se le captura asistencia." };
+  }
+
+  const hoy = new Date();
+  const corte = new Date(
+    Date.UTC(hoy.getFullYear(), hoy.getMonth(), hoy.getDate()),
+  );
+  if (encontrada.fecha > corte) {
+    return { error: "Esa sesión todavía no pasa." };
+  }
+
+  await db.$transaction([
+    db.asistencia.upsert({
+      where: { sesion_id: id },
+      create: { sesion_id: id, cantidad, capturada_por: sesion.user.id },
+      update: { cantidad, capturada_por: sesion.user.id },
+    }),
+    db.sesion.update({ where: { id }, data: { estado: "realizada" } }),
+  ]);
+
+  refrescar();
+  revalidatePath("/admin/dashboard");
+
+  return {
+    exito:
+      cantidad === 0
+        ? "Quedó registrada como realizada, sin asistentes."
+        : `Quedaron registrados ${cantidad} asistentes.`,
+  };
+}
+
 export async function crearSesionSuelta(
   _estado: EstadoSesion,
   datos: FormData,
