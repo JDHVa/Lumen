@@ -3,6 +3,7 @@
 import { useCallback, useState } from "react";
 import { Tarjeta } from "@/components/ui/Tarjeta";
 import { Etiqueta } from "@/components/ui/Etiqueta";
+import { BotonSimple } from "@/components/ui/BotonAccion";
 import { FormularioCarrera } from "./FormularioCarrera";
 import type { CarreraLista } from "./tipos";
 
@@ -36,13 +37,9 @@ export function ListaCarreras({ carreras }: { carreras: CarreraLista[] }) {
                     ? "1 materia"
                     : `${carrera.cuantas} materias`}
                 </span>
-                <button
-                  type="button"
-                  onClick={() => setEditando(carrera.id)}
-                  className="min-h-[40px] px-1 text-sm text-marino underline underline-offset-4 hover:text-marino-claro"
-                >
+                <BotonSimple onClick={() => setEditando(carrera.id)}>
                   Editar
-                </button>
+                </BotonSimple>
               </div>
             )}
           </Tarjeta>

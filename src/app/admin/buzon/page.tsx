@@ -3,6 +3,7 @@ import { Tarjeta } from "@/components/ui/Tarjeta";
 import { Etiqueta } from "@/components/ui/Etiqueta";
 import { Seccion } from "@/components/ui/Seccion";
 import { Aviso } from "@/components/ui/Aviso";
+import { BotonAccion } from "@/components/ui/BotonAccion";
 import { ORIENTACION } from "@/lib/contacto";
 import { cambiarEstadoMensaje } from "./acciones";
 
@@ -30,21 +31,20 @@ function Accion({
   id,
   destino,
   texto,
+  tono,
 }: {
   id: string;
   destino: string;
   texto: string;
+  tono?: "neutral" | "afirmar" | "peligro";
 }) {
   return (
     <form action={cambiarEstadoMensaje}>
       <input type="hidden" name="id" value={id} />
       <input type="hidden" name="estado" value={destino} />
-      <button
-        type="submit"
-        className="min-h-[40px] px-1 text-sm text-tinta-suave underline underline-offset-4 hover:text-marino"
-      >
+      <BotonAccion type="submit" tono={tono}>
         {texto}
-      </button>
+      </BotonAccion>
     </form>
   );
 }
@@ -157,6 +157,7 @@ export default async function PaginaBuzonAdmin() {
                         id={mensaje.id}
                         destino="atendido"
                         texto="Marcar como atendido"
+                        tono="afirmar"
                       />
                     ) : (
                       <Accion

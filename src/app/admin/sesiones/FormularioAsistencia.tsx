@@ -4,6 +4,7 @@ import { useActionState, useState } from "react";
 import { Boton } from "@/components/ui/Boton";
 import { Campo } from "@/components/ui/Campo";
 import { Aviso } from "@/components/ui/Aviso";
+import { BotonSimple } from "@/components/ui/BotonAccion";
 import { capturarAsistencia, type EstadoSesion } from "./acciones";
 
 const estadoInicial: EstadoSesion = {};
@@ -23,15 +24,15 @@ export function FormularioAsistencia({
 
   if (!abierto) {
     return (
-      <button
-        type="button"
+      <BotonSimple
         onClick={() => setAbierto(true)}
-        className="min-h-[40px] px-1 text-sm text-marino underline underline-offset-4 hover:text-marino-claro"
+        className="self-start"
+        tono={cantidadPrevia === null ? "afirmar" : "neutral"}
       >
         {cantidadPrevia === null
           ? "Capturar asistencia"
           : "Corregir la asistencia"}
-      </button>
+      </BotonSimple>
     );
   }
 

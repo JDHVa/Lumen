@@ -2,6 +2,7 @@ import { db } from "@/lib/db";
 import { Tarjeta } from "@/components/ui/Tarjeta";
 import { Etiqueta } from "@/components/ui/Etiqueta";
 import { Seccion } from "@/components/ui/Seccion";
+import { BotonAccion } from "@/components/ui/BotonAccion";
 import { leerClaveBloque, nombreDia, etiquetaDeBloque } from "@/lib/horarios";
 import { cambiarEstado } from "./acciones";
 
@@ -36,21 +37,20 @@ function Accion({
   id,
   destino,
   texto,
+  tono,
 }: {
   id: string;
   destino: string;
   texto: string;
+  tono?: "neutral" | "afirmar" | "peligro";
 }) {
   return (
     <form action={cambiarEstado}>
       <input type="hidden" name="id" value={id} />
       <input type="hidden" name="estado" value={destino} />
-      <button
-        type="submit"
-        className="min-h-[40px] px-1 text-sm text-tinta-suave underline underline-offset-4 hover:text-marino"
-      >
+      <BotonAccion type="submit" tono={tono}>
         {texto}
-      </button>
+      </BotonAccion>
     </form>
   );
 }
@@ -164,6 +164,7 @@ export default async function PaginaSolicitudes() {
                             id={solicitud.id}
                             destino="oculta"
                             texto="Ocultar"
+                            tono="peligro"
                           />
                         ) : null}
                       </div>

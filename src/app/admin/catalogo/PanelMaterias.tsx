@@ -5,6 +5,7 @@ import { Tarjeta } from "@/components/ui/Tarjeta";
 import { Etiqueta } from "@/components/ui/Etiqueta";
 import { Campo, Casilla } from "@/components/ui/Campo";
 import { Selector } from "@/components/ui/Selector";
+import { BotonAccion, BotonSimple } from "@/components/ui/BotonAccion";
 import { alternarMateria } from "./acciones";
 import { FormularioMateria } from "./FormularioMateria";
 import { FormularioMaterias } from "./FormularioMaterias";
@@ -124,21 +125,17 @@ export function PanelMaterias({
                     {!materia.activa ? (
                       <Etiqueta tono="alerta">desactivada</Etiqueta>
                     ) : null}
-                    <button
-                      type="button"
-                      onClick={() => setEditando(materia.id)}
-                      className="min-h-[40px] px-1 text-sm text-marino underline underline-offset-4 hover:text-marino-claro"
-                    >
+                    <BotonSimple onClick={() => setEditando(materia.id)}>
                       Editar
-                    </button>
+                    </BotonSimple>
                     <form action={alternarMateria}>
                       <input type="hidden" name="id" value={materia.id} />
-                      <button
+                      <BotonAccion
                         type="submit"
-                        className="min-h-[40px] px-1 text-sm text-tinta-suave underline underline-offset-4 hover:text-marino"
+                        tono={materia.activa ? "peligro" : "afirmar"}
                       >
                         {materia.activa ? "Desactivar" : "Reactivar"}
-                      </button>
+                      </BotonAccion>
                     </form>
                   </div>
                 )}

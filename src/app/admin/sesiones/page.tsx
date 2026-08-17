@@ -7,6 +7,7 @@ import { diaSemanaDe, fechaLegible } from "@/lib/fechas";
 import { cambiarEstadoSesion } from "./acciones";
 import { FormularioSesion } from "./FormularioSesion";
 import { FormularioAsistencia } from "./FormularioAsistencia";
+import { BotonAccion } from "@/components/ui/BotonAccion";
 
 export const dynamic = "force-dynamic";
 
@@ -143,12 +144,9 @@ export default async function PaginaSesiones() {
                             name="estado"
                             value="publicada"
                           />
-                          <button
-                            type="submit"
-                            className="min-h-[40px] px-1 text-sm text-tinta-suave underline underline-offset-4 hover:text-marino"
-                          >
+                          <BotonAccion type="submit" tono="afirmar">
                             Publicar
-                          </button>
+                          </BotonAccion>
                         </form>
                       ) : null}
 
@@ -160,12 +158,9 @@ export default async function PaginaSesiones() {
                             name="estado"
                             value="cancelada"
                           />
-                          <button
-                            type="submit"
-                            className="min-h-[40px] px-1 text-sm text-tinta-suave underline underline-offset-4 hover:text-marino"
-                          >
+                          <BotonAccion type="submit" tono="peligro">
                             Cancelar
-                          </button>
+                          </BotonAccion>
                         </form>
                       ) : null}
                     </div>

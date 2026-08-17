@@ -4,6 +4,7 @@ import { BotonEnlace } from "@/components/ui/Boton";
 import { Tarjeta } from "@/components/ui/Tarjeta";
 import { Etiqueta } from "@/components/ui/Etiqueta";
 import { Seccion } from "@/components/ui/Seccion";
+import { BotonAccion } from "@/components/ui/BotonAccion";
 import { alternarActivo } from "./acciones";
 
 export const dynamic = "force-dynamic";
@@ -107,12 +108,12 @@ export default async function PaginaZhensis() {
                       {zhensi.id === sesion?.user.id ? null : (
                         <form action={alternarActivo}>
                           <input type="hidden" name="id" value={zhensi.id} />
-                          <button
+                          <BotonAccion
                             type="submit"
-                            className="min-h-[40px] px-1 text-sm text-tinta-suave underline underline-offset-4 hover:text-marino"
+                            tono={zhensi.activo ? "peligro" : "afirmar"}
                           >
                             {zhensi.activo ? "Desactivar" : "Reactivar"}
-                          </button>
+                          </BotonAccion>
                         </form>
                       )}
                     </div>
