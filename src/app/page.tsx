@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { BotonEnlace } from "@/components/ui/Boton";
 import { Tarjeta } from "@/components/ui/Tarjeta";
 import { Etiqueta } from "@/components/ui/Etiqueta";
@@ -10,6 +11,7 @@ import {
   esEnLinea,
 } from "@/lib/horarios";
 import { diaSemanaDe, fechaLegible } from "@/lib/fechas";
+import { ligaWhatsapp } from "@/lib/contacto";
 import { db } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
@@ -62,6 +64,24 @@ export default async function PaginaInicio() {
     },
   });
 
+  const porDia: {
+    etiqueta: string;
+    dia: number;
+    sesiones: typeof proximas;
+  }[] = [];
+
+  for (const sesion of proximas) {
+    const etiqueta = fechaLegible(sesion.fecha);
+    const ultimo = porDia.at(-1);
+    if (ultimo && ultimo.etiqueta === etiqueta) ultimo.sesiones.push(sesion);
+    else
+      porDia.push({
+        etiqueta,
+        dia: diaSemanaDe(sesion.fecha),
+        sesiones: [sesion],
+      });
+  }
+
   return (
     <div className="flex min-h-screen flex-col">
       <EncabezadoPublico />
@@ -113,42 +133,54 @@ export default async function PaginaInicio() {
               </p>
             </Tarjeta>
           ) : (
-            <ul className="grid gap-4 sm:grid-cols-2">
-              {proximas.map((sesion) => {
-                const dia = diaSemanaDe(sesion.fecha);
-                return (
-                  <li key={sesion.id}>
-                    <Tarjeta
-                      elevada
-                      className="flex h-full flex-col gap-2 p-5 text-left"
-                    >
-                      <div className="flex flex-wrap items-center gap-2">
-                        <Etiqueta tono="marino">
-                          {fechaLegible(sesion.fecha)}
-                        </Etiqueta>
-                        <Etiqueta tono="apagado">
-                          {etiquetaDeBloque(dia, sesion.hora_inicio)}
-                        </Etiqueta>
-                        {esEnLinea(dia) ? (
-                          <Etiqueta tono="dorado">en línea</Etiqueta>
-                        ) : null}
-                      </div>
-                      <span className="font-titulos text-xl font-semibold text-marino">
-                        {sesion.titulo}
-                      </span>
-                      <span className="text-sm text-tinta-suave">
-                        Con {sesion.zhensi.nombre} · {sesion.salon}
-                      </span>
-                      {sesion.notas_publicas ? (
-                        <span className="text-sm text-tinta-suave">
-                          {sesion.notas_publicas}
-                        </span>
-                      ) : null}
-                    </Tarjeta>
-                  </li>
-                );
-              })}
-            </ul>
+            <div className="flex flex-col gap-8">
+              {porDia.map((grupo) => (
+                <div key={grupo.etiqueta} className="flex flex-col gap-4">
+                  <div className="flex items-center gap-3">
+                    <h3 className="font-titulos text-lg font-semibold text-marino">
+                      {grupo.etiqueta}
+                    </h3>
+                    {esEnLinea(grupo.dia) ? (
+                      <Etiqueta tono="dorado">en línea</Etiqueta>
+                    ) : null}
+                    <span className="h-px flex-1 bg-marino/10" />
+                  </div>
+
+                  <ul className="grid gap-4 sm:grid-cols-2">
+                    {grupo.sesiones.map((sesion) => (
+                      <li key={sesion.id}>
+                        <Tarjeta
+                          elevada
+                          className="flex h-full flex-col gap-2 p-5 text-left"
+                        >
+                          <Etiqueta tono="marino">
+                            {etiquetaDeBloque(grupo.dia, sesion.hora_inicio)}
+                          </Etiqueta>
+                          <span className="font-titulos text-xl font-semibold text-marino">
+                            {sesion.titulo}
+                          </span>
+                          <span className="text-sm text-tinta-suave">
+                            Con {sesion.zhensi.nombre} · {sesion.salon}
+                          </span>
+                          {sesion.notas_publicas ? (
+                            <span className="text-sm text-tinta-suave">
+                              {sesion.notas_publicas}
+                            </span>
+                          ) : null}
+                        </Tarjeta>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+
+              <Link
+                href="/zhensis"
+                className="text-sm text-marino underline underline-offset-4 hover:text-marino-claro"
+              >
+                ¿Quiénes son los que dan las sesiones?
+              </Link>
+            </div>
           )}
         </section>
 
@@ -182,12 +214,20 @@ export default async function PaginaInicio() {
             </h2>
             <p className="mx-auto max-w-lg pt-3 leading-relaxed text-white/80">
               Los zhenshis son alumnos que dan sesiones de apoyo a sus
-              compañeros. Si te interesa entrarle, habla con alguien del equipo
-              de Lumen y te damos tu cuenta.
+              compañeros. Si te interesa entrarle, escríbenos y te damos tu
+              cuenta.
             </p>
-            <div className="flex justify-center pt-6">
+            <div className="flex flex-col justify-center gap-3 pt-6 sm:flex-row">
               <BotonEnlace href="/zhensis" variante="principal">
                 Conoce a los zhenshis
+              </BotonEnlace>
+              <BotonEnlace
+                href={ligaWhatsapp("Hola, me interesa ser zhenshi en Lumen.")}
+                variante="contorno"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Escríbenos
               </BotonEnlace>
             </div>
           </div>

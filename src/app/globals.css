@@ -36,19 +36,21 @@ html {
   scroll-behavior: smooth;
 }
 
-body {
-  background-color: var(--color-arena);
-  color: var(--color-tinta);
-  font-family: var(--font-texto);
-  text-rendering: optimizeLegibility;
-}
+@layer base {
+  body {
+    background-color: var(--color-arena);
+    color: var(--color-tinta);
+    font-family: var(--font-texto);
+    text-rendering: optimizeLegibility;
+  }
 
-h1,
-h2,
-h3 {
-  font-family: var(--font-titulos);
-  letter-spacing: -0.015em;
-  color: var(--color-marino);
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-titulos);
+    letter-spacing: -0.015em;
+    color: var(--color-marino);
+  }
 }
 
 :focus-visible {
