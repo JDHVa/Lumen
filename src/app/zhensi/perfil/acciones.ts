@@ -129,6 +129,8 @@ export async function guardarPerfil(
 
   revalidatePath("/zhensi/perfil");
   revalidatePath("/admin/zhensis");
+  revalidatePath(`/admin/zhensis/${usuario_id}`);
+  revalidatePath("/zhensis");
 
   const cuantas =
     validas.length === 1 ? "1 materia" : `${validas.length} materias`;
