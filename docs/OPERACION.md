@@ -17,22 +17,35 @@ cuentas y los mensajes del buzón.** Nunca lo subas a ningún lado sin cifrar.
 
 ### El respaldo automático
 
-Corre solo cada **sábado a las 9 de la mañana** con GitHub Actions, y también se
-puede disparar a mano desde la pestaña *Actions* del repositorio.
+**Este repositorio es público a propósito**, para que cualquier prepa pueda
+copiar el proyecto y montar el suyo. Por eso la tarea de respaldo **no vive
+aquí**: en un repositorio público, los archivos que generan las tareas los
+puede descargar cualquiera, y un respaldo trae los mensajes del buzón, los
+teléfonos de los zhenshis y sus horarios.
 
-Para que funcione hay que crear dos secretos en
-*Settings → Secrets and variables → Actions*:
+El código es de todos. Los datos de tus alumnos no.
+
+La tarea vive en un repositorio aparte y privado. Para montarlo:
+
+1. Crea un repositorio nuevo en GitHub, **marcado como Private**. Puede
+   llamarse `lumen-respaldos` y estar vacío.
+2. Dentro, crea el archivo `.github/workflows/respaldo.yml` y pega tal cual el
+   contenido de `docs/respaldo-privado.yml` de este repositorio.
+3. Si tu copia de Lumen no está en `JDHVa/Lumen`, cambia esa línea por la tuya.
+4. En *Settings → Secrets and variables → Actions* de ese repositorio privado,
+   crea dos secretos:
 
 | Secreto | Qué es |
 |---|---|
 | `DATABASE_URL` | La misma cadena que tienes en tu `.env` |
-| `CLAVE_RESPALDO` | Una contraseña que te inventes, para cifrar el archivo |
+| `CLAVE_RESPALDO` | Una contraseña larga y al azar, solo para cifrar |
 
 **Guarda `CLAVE_RESPALDO` en tu gestor de contraseñas.** Si se pierde, los
-respaldos cifrados no se pueden abrir nunca más. No hay forma de recuperarlos.
+respaldos cifrados no se abren nunca más.
 
-El respaldo queda guardado 90 días como artefacto de la ejecución, siempre
-cifrado.
+Corre solo cada **sábado a las 9 de la mañana**, y también se puede disparar a
+mano desde la pestaña *Actions*. El archivo queda guardado 90 días, siempre
+cifrado y solo visible para quien tenga acceso a ese repositorio privado.
 
 ### Abrir un respaldo cifrado
 
