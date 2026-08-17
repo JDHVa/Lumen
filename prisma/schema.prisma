@@ -61,6 +61,18 @@ model usuario {
   @@map("usuario")
 }
 
+model intento_acceso {
+  id        String   @id @default(uuid())
+  usuario   String
+  origen    String
+  logrado   Boolean  @default(false)
+  creado_en DateTime @default(now())
+
+  @@index([usuario, creado_en])
+  @@index([origen, creado_en])
+  @@map("intento_acceso")
+}
+
 model perfil_zhensi {
   usuario_id        String  @id
   foto_url          String?

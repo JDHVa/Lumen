@@ -13,6 +13,9 @@ export async function guardarDisponibilidad(
 ): Promise<EstadoDisponibilidad> {
   const sesion = await auth();
   if (!sesion?.user) return { error: "Tu sesión se cerró. Vuelve a entrar." };
+  if (!sesion.user.es_zhensi) {
+    return { error: "Solo los zhenshis capturan disponibilidad." };
+  }
 
   const bloques = datos
     .getAll("bloque")

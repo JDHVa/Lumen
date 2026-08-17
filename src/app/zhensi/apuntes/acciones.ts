@@ -18,6 +18,9 @@ export async function subirApunte(
 ): Promise<EstadoApunte> {
   const sesion = await auth();
   if (!sesion?.user) return { error: "Tu sesión se cerró. Vuelve a entrar." };
+  if (!sesion.user.es_zhensi) {
+    return { error: "Solo los zhenshis pueden subir apuntes." };
+  }
 
   const titulo = String(datos.get("titulo") ?? "").trim();
   if (titulo.length < 4) {
