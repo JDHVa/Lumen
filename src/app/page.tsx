@@ -59,7 +59,7 @@ export default function PaginaInicio() {
             <BotonEnlace href="/pedir-ayuda" tamano="grande">
               Pedir ayuda
             </BotonEnlace>
-            <BotonEnlace href="/tablero" variante="contorno" tamano="grande">
+            <BotonEnlace href="/solicitudes" variante="contorno" tamano="grande">
               Ver las solicitudes
             </BotonEnlace>
           </div>

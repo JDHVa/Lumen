@@ -24,7 +24,7 @@ Estos términos se usan tal cual en la interfaz, en el código y en la base de
 datos. No se traducen ni se sustituyen por sinónimos.
 
 - **Schüler**: cualquier alumno que busca ayuda. Nunca tiene cuenta.
-- **Zhensi**: alumno destacado que da las sesiones. Tiene cuenta.
+- **Zhenshi**: alumno destacado que da las sesiones. Tiene cuenta.
 - **Admin**: coordina el proyecto. Tiene cuenta. Todos los admin son también
   zhensi.
 - **Solicitud**: petición pública de ayuda sobre una materia o un tema

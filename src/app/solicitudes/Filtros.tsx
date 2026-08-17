@@ -13,7 +13,7 @@ export function Filtros({ carreras }: { carreras: CarreraLista[] }) {
     const nuevos = new URLSearchParams(parametros.toString());
     if (valor) nuevos.set(nombre, valor);
     else nuevos.delete(nombre);
-    router.replace(nuevos.size > 0 ? `/tablero?${nuevos}` : "/tablero");
+    router.replace(nuevos.size > 0 ? `/solicitudes?${nuevos}` : "/solicitudes");
   }
 
   return (

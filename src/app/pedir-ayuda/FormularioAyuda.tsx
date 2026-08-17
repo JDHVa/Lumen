@@ -60,7 +60,7 @@ export function FormularioAyuda({
           solicitud en la lista y ver si ya tiene fecha y salón.
         </p>
         <div className="flex flex-col gap-3 sm:flex-row">
-          <BotonEnlace href={`/tablero?codigo=${estado.codigo}`}>
+          <BotonEnlace href={`/solicitudes?codigo=${estado.codigo}`}>
             Ver mi solicitud
           </BotonEnlace>
           <BotonEnlace href="/" variante="contorno">

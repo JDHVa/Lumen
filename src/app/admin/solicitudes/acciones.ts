@@ -29,5 +29,5 @@ export async function cambiarEstado(datos: FormData) {
   });
 
   revalidatePath("/admin/solicitudes");
-  revalidatePath("/tablero");
+  revalidatePath("/solicitudes");
 }

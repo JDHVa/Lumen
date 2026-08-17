@@ -31,7 +31,7 @@ function resumirFranjas(crudas: unknown) {
     .map(([dia, horas]) => `${nombreDia(dia)}: ${horas.join(", ")}`);
 }
 
-export default async function PaginaTablero({
+export default async function PaginaSolicitudes({
   searchParams,
 }: {
   searchParams: Promise<{ carrera?: string; codigo?: string }>;

@@ -113,7 +113,7 @@ export async function crearSolicitud(
   await asegurarHuella();
   await registrarEnvio(tope.recientes);
 
-  revalidatePath("/tablero");
+  revalidatePath("/solicitudes");
 
   return { codigo: creada.codigo_publico };
 }

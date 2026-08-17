@@ -31,5 +31,5 @@ export async function apoyar(datos: FormData) {
     }),
   ]);
 
-  revalidatePath("/tablero");
+  revalidatePath("/solicitudes");
 }
