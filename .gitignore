@@ -7,14 +7,10 @@ build/
 next-env.d.ts
 .vercel/
 
-# Variables de entorno: aquí viven todas las llaves.
-# Lo único que se sube es .env.example, con valores de mentira.
 .env
 .env.*
 !.env.example
 
-# Respaldos de la base. Traen las contraseñas cifradas de todas las
-# cuentas y los mensajes del buzón. Nunca deben subirse.
 respaldos/
 *.sql
 *.dump
@@ -22,7 +18,6 @@ respaldos/
 *.sqlite3
 *.db
 
-# Llaves y certificados
 *.pem
 *.key
 *.p12
@@ -34,14 +29,12 @@ credenciales*.json
 service-account*.json
 *serviceaccount*.json
 
-# Archivos temporales míos y de herramientas
 *-tmp.ts
 *-tmp.tsx
 tmp/
 temporal/
 .cache/
 
-# Basura del sistema y de los editores
 .DS_Store
 Thumbs.db
 desktop.ini
