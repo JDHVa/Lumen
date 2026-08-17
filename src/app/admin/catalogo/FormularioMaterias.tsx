@@ -58,7 +58,7 @@ export function FormularioMaterias({
         etiqueta="Materias"
         name="nombres"
         required
-        placeholder={"Cálculo Diferencial\nProgramación Estructurada\nFísica I"}
+        placeholder={"Matemáticas I\nQuímica I\nLectura y Redacción"}
         ayuda="Una por renglón. Puedes pegar la lista completa de un jalón y se guardan todas juntas."
       />
 

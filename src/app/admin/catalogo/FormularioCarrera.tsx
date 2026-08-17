@@ -36,7 +36,7 @@ export function FormularioCarrera({
           name="nombre"
           required
           defaultValue={carrera?.nombre}
-          placeholder="Ingeniería en Sistemas Computacionales"
+          placeholder="Técnico en Mecatrónica Industrial"
         />
         <Campo
           etiqueta="Clave"
@@ -46,7 +46,7 @@ export function FormularioCarrera({
           autoCorrect="off"
           spellCheck={false}
           defaultValue={carrera?.clave}
-          placeholder="ISC"
+          placeholder="TMI"
           className="uppercase"
         />
       </div>

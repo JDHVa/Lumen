@@ -83,8 +83,8 @@ export function FormularioAyuda({
             Es de una materia
           </span>
           <span className="text-sm leading-relaxed text-tinta-suave">
-            Álgebra, contabilidad, programación… Eliges tu materia de la lista y
-            nos dices qué tema en concreto no te sale.
+            Matemáticas, química, inglés… Eliges tu materia de la lista y nos
+            dices qué tema en concreto no te sale.
           </span>
         </button>
 
@@ -97,8 +97,8 @@ export function FormularioAyuda({
             Es otra cosa
           </span>
           <span className="text-sm leading-relaxed text-tinta-suave">
-            Cómo estudiar para un examen, Excel para el proyecto, hacer una
-            presentación… Lo escribes con tus palabras.
+            Cómo estudiar para un examen, preparar una exposición, organizar tus
+            apuntes… Lo escribes con tus palabras.
           </span>
         </button>
       </div>
@@ -172,7 +172,7 @@ export function FormularioAyuda({
                 maxLength={120}
                 value={tituloTema}
                 onChange={(evento) => setTituloTema(evento.target.value)}
-                placeholder="Excel para el proyecto integrador"
+                placeholder="Cómo preparar una exposición"
               />
 
               <Selector
@@ -203,8 +203,8 @@ export function FormularioAyuda({
             onChange={(evento) => setDescripcion(evento.target.value)}
             placeholder={
               tipo === "materia"
-                ? "Derivadas por regla de la cadena. Entiendo las básicas pero me pierdo cuando hay función dentro de función."
-                : "Necesito armar tablas dinámicas y gráficas para el proyecto y nunca he usado Excel."
+                ? "Ecuaciones de segundo grado. Entiendo cuando me la explican pero a la hora de hacerla sola me trabo con la fórmula general."
+                : "Tengo que exponer el viernes y me da muchos nervios hablar enfrente. Quiero que alguien me ayude a preparar la exposición."
             }
             ayuda="Entre más claro seas, más fácil es que alguien le entre."
           />
