@@ -177,13 +177,22 @@ export default async function PaginaDashboard() {
         </div>
       </Seccion>
 
-      <Seccion titulo="Buzón">
-        <Tarjeta className="flex items-center justify-between gap-3 py-5">
-          <span className="text-sm leading-relaxed text-tinta-suave">
-            Los mensajes por categoría entran cuando exista el buzón.
-          </span>
-          <Etiqueta tono="apagado">Fase 7</Etiqueta>
-        </Tarjeta>
+      <Seccion
+        titulo="Buzón"
+        descripcion={`${datos.buzon.total} mensajes, ${datos.buzon.sinAtender} sin atender.`}
+      >
+        <div className="grid gap-3 sm:grid-cols-3">
+          <Numero valor={datos.buzon.sugerencia} etiqueta="Sugerencias" />
+          <Numero
+            valor={datos.buzon.agradecimiento}
+            etiqueta="Agradecimientos"
+          />
+          <Numero
+            valor={datos.buzon.apoyo}
+            etiqueta="De apoyo"
+            nota="Se canalizan, no se atienden aquí"
+          />
+        </div>
       </Seccion>
     </div>
   );

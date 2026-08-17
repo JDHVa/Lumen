@@ -31,6 +31,19 @@ export async function cargarMetricas() {
     db.usuario.count({ where: { es_zhensi: true, activo: true } }),
   ]);
 
+  const mensajes = await db.mensaje_buzon.findMany({
+    select: { categoria: true, estado: true },
+  });
+
+  const buzon = {
+    sugerencia: mensajes.filter((uno) => uno.categoria === "sugerencia").length,
+    agradecimiento: mensajes.filter((uno) => uno.categoria === "agradecimiento")
+      .length,
+    apoyo: mensajes.filter((uno) => uno.categoria === "apoyo").length,
+    sinAtender: mensajes.filter((uno) => uno.estado !== "atendido").length,
+    total: mensajes.length,
+  };
+
   const resumen = resumirSesiones(realizadas);
 
   const porZhenshi = new Map<
@@ -93,5 +106,6 @@ export async function cargarMetricas() {
     espera,
     zhenshisRegistrados: cuentas,
     totalSolicitudes: solicitudes.length,
+    buzon,
   };
 }
