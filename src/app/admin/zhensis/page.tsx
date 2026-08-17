@@ -38,7 +38,7 @@ export default async function PaginaZhensis() {
   return (
     <div className="flex flex-col gap-8">
       <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-bold">Zhensis</h1>
+        <h1 className="text-3xl font-bold">Zhenshis</h1>
         <p className="leading-relaxed text-tinta-suave">
           Aquí ves quién ya llenó su perfil y quién no. Si a alguien le da flojera
           entrar, tú puedes llenárselo desde aquí.
@@ -51,7 +51,7 @@ export default async function PaginaZhensis() {
       >
         {zhensis.length === 0 ? (
           <Tarjeta className="py-10 text-center text-sm text-tinta-suave">
-            Todavía no hay zhensis. Créalos en la pestaña de Usuarios.
+            Todavía no hay zhenshis. Créalos en la pestaña de Usuarios.
           </Tarjeta>
         ) : (
           <ul className="flex flex-col gap-2.5">

@@ -40,7 +40,7 @@ export async function crearUsuario(
   }
 
   if (!esZhensi && !esAdmin) {
-    return { error: "Marca al menos un rol: zhensi, admin o los dos." };
+    return { error: "Marca al menos un rol: zhenshi, admin o los dos." };
   }
 
   const repetido = await db.usuario.findUnique({ where: { usuario } });

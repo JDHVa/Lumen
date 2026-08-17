@@ -26,7 +26,7 @@ export default function PaginaAdmin() {
           <div className="flex flex-col gap-1">
             <h2 className="text-xl font-semibold">Usuarios</h2>
             <p className="text-sm text-tinta-suave">
-              Da de alta zhensis y admin.
+              Da de alta zhenshis y admin.
             </p>
           </div>
           <BotonEnlace href="/admin/usuarios">Abrir</BotonEnlace>
@@ -54,7 +54,7 @@ export default function PaginaAdmin() {
 
         <Tarjeta elevada className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex flex-col gap-1">
-            <h2 className="text-xl font-semibold">Zhensis</h2>
+            <h2 className="text-xl font-semibold">Zhenshis</h2>
             <p className="text-sm text-tinta-suave">
               Revisa perfiles, asigna materias y da de baja.
             </p>

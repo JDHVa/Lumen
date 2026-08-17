@@ -31,7 +31,7 @@ export function BarraSesion({
         <div className="flex items-center gap-2">
           <span className="text-sm text-tinta-suave">{nombre}</span>
           <Etiqueta tono={zona === "admin" ? "dorado" : "marino"}>
-            {zona === "admin" ? "admin" : "zhensi"}
+            {zona === "admin" ? "admin" : "zhenshi"}
           </Etiqueta>
         </div>
 
@@ -41,7 +41,7 @@ export function BarraSesion({
               href={zona === "admin" ? "/zhensi" : "/admin"}
               className="inline-flex min-h-[40px] items-center rounded-suave bg-dorado px-3.5 text-sm font-semibold text-marino-hondo transition-colors hover:bg-dorado-hondo"
             >
-              {zona === "admin" ? "Mi vista de zhensi" : "Panel de administración"}
+              {zona === "admin" ? "Mi vista de zhenshi" : "Panel de administración"}
             </Link>
           ) : null}
 

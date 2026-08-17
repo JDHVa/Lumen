@@ -22,7 +22,7 @@ export async function guardarPerfil(
 
   const duenio = await db.usuario.findUnique({ where: { id: usuario_id } });
   if (!duenio || !duenio.es_zhensi) {
-    return { error: "Esa cuenta no es de un zhensi." };
+    return { error: "Esa cuenta no es de un zhenshi." };
   }
 
   const carreraCruda = String(datos.get("carrera_id") ?? "");

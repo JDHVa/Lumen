@@ -54,7 +54,7 @@ export default async function PaginaZhensi() {
       <div className="flex flex-col gap-2">
         <h1 className="text-3xl font-bold">Hola, {sesion.user.nombre}</h1>
         <p className="leading-relaxed text-tinta-suave">
-          Esta es tu vista de zhensi. Aquí vas a llevar tu disponibilidad, tus
+          Esta es tu vista de zhenshi. Aquí vas a llevar tu disponibilidad, tus
           sesiones y tu perfil.
         </p>
       </div>
@@ -89,7 +89,7 @@ export default async function PaginaZhensi() {
 
       {perfil?.visible_publico ? (
         <p className="text-sm text-tinta-suave">
-          Estás apareciendo en la galería pública de zhensis.
+          Estás apareciendo en la galería pública de zhenshis.
         </p>
       ) : null}
 

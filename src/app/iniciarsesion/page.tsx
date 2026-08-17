@@ -26,7 +26,7 @@ export default async function PaginaEntrar({
         </Link>
         <h1 className="text-3xl font-bold">Entrar a Lumen</h1>
         <p className="leading-relaxed text-tinta-suave">
-          Solo para zhensis y admin. Si buscas ayuda, no necesitas cuenta.
+          Solo para zhenshis y admin. Si buscas ayuda, no necesitas cuenta.
         </p>
       </div>
 

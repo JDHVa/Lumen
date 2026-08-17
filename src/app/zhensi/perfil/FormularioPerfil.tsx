@@ -139,7 +139,7 @@ export function FormularioPerfil({
         <Casilla
           name="visible_publico"
           defaultChecked={perfil?.visible_publico ?? false}
-          etiqueta="Quiero aparecer en la galería de zhensis"
+          etiqueta="Quiero aparecer en la galería de zhenshis"
           ayuda="Se muestran tu nombre, tu carrera, tus materias y tu línea de arriba. Puedes apagarlo cuando quieras."
         />
       </Seccion>

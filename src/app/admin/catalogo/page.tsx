@@ -47,7 +47,7 @@ export default async function PaginaCatalogo() {
         <h1 className="text-3xl font-bold">Catálogo</h1>
         <p className="leading-relaxed text-tinta-suave">
           Aquí se cargan las carreras y sus materias. Es lo único que los
-          zhensis y los schüler van a poder elegir más adelante, así que lo que
+          zhenshis y los schüler van a poder elegir más adelante, así que lo que
           no esté aquí no existe para ellos.
         </p>
       </div>

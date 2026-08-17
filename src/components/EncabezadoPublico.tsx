@@ -3,7 +3,7 @@ import Link from "next/link";
 
 const enlaces = [
   { href: "/solicitudes", texto: "Solicitudes" },
-  { href: "/zhensis", texto: "Zhensis" },
+  { href: "/zhensis", texto: "Zhenshis" },
   { href: "/apuntes", texto: "Apuntes" },
   { href: "/buzon", texto: "Buzón" },
 ];

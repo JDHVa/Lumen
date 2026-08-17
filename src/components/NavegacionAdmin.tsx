@@ -8,7 +8,7 @@ const enlaces = [
   { href: "/admin/usuarios", texto: "Usuarios" },
   { href: "/admin/solicitudes", texto: "Solicitudes" },
   { href: "/admin/catalogo", texto: "Catálogo" },
-  { href: "/admin/zhensis", texto: "Zhensis" },
+  { href: "/admin/zhensis", texto: "Zhenshis" },
 ];
 
 export function NavegacionAdmin() {

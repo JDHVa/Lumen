@@ -60,7 +60,7 @@ export default async function PaginaUsuarios() {
                   </div>
                   <div className="ml-auto flex flex-wrap items-center gap-1.5">
                     {cuenta.es_zhensi ? (
-                      <Etiqueta tono="marino">zhensi</Etiqueta>
+                      <Etiqueta tono="marino">zhenshi</Etiqueta>
                     ) : null}
                     {cuenta.es_admin ? (
                       <Etiqueta tono="dorado">admin</Etiqueta>

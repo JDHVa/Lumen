@@ -5,7 +5,7 @@ export default function PaginaPrivacidad() {
     <EnConstruccion
       fase="Fase 9"
       titulo="Aviso de privacidad"
-      descripcion="Qué datos guarda Lumen de zhensis y admin, y por qué del schüler no guarda ninguno."
+      descripcion="Qué datos guarda Lumen de zhenshis y admin, y por qué del schüler no guarda ninguno."
     />
   );
 }

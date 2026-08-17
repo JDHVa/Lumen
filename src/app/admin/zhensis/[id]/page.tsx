@@ -48,7 +48,7 @@ export default async function PaginaZhensiAdmin({
           variante="texto"
           className="self-start"
         >
-          ← Volver a zhensis
+          ← Volver a zhenshis
         </BotonEnlace>
         <h1 className="text-3xl font-bold">{zhensi.nombre}</h1>
         <p className="leading-relaxed text-tinta-suave">
@@ -58,7 +58,7 @@ export default async function PaginaZhensiAdmin({
       </div>
 
       <Aviso tono="neutral">
-        La disponibilidad solo la puede capturar el zhensi desde su cuenta.
+        La disponibilidad solo la puede capturar el zhenshi desde su cuenta.
         {porDia.length === 0
           ? " Todavía no ha marcado ningún horario."
           : ""}

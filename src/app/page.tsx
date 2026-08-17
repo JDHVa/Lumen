@@ -23,7 +23,7 @@ const pasos = [
     numero: "3",
     titulo: "Alguien lo agenda",
     texto:
-      "Un admin busca al zhensi indicado, aparta salón y hora, y la sesión se publica aquí.",
+      "Un admin busca al zhenshi indicado, aparta salón y hora, y la sesión se publica aquí.",
   },
   {
     numero: "4",
@@ -76,7 +76,7 @@ export default function PaginaInicio() {
           <Tarjeta className="flex flex-col items-center gap-3 py-12 text-center">
             <p className="max-w-sm leading-relaxed text-tinta-suave">
               Aquí van a aparecer las sesiones ya agendadas, con la materia, el
-              zhensi que la da, el día, la hora y el salón.
+              zhenshi que la da, el día, la hora y el salón.
             </p>
             <p className="max-w-sm leading-relaxed text-tinta-suave">
               Entre semana son presenciales, de 12 a 6 de la tarde.{" "}
@@ -114,13 +114,13 @@ export default function PaginaInicio() {
               ¿Te late explicar lo que ya dominas?
             </h2>
             <p className="mx-auto max-w-lg pt-3 leading-relaxed text-white/80">
-              Los zhensis son alumnos que dan sesiones de apoyo a sus
+              Los zhenshis son alumnos que dan sesiones de apoyo a sus
               compañeros. Si te interesa entrarle, habla con alguien del equipo
               de Lumen y te damos tu cuenta.
             </p>
             <div className="flex justify-center pt-6">
               <BotonEnlace href="/zhensis" variante="principal">
-                Conoce a los zhensis
+                Conoce a los zhenshis
               </BotonEnlace>
             </div>
           </div>

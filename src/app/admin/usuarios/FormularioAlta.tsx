@@ -45,7 +45,7 @@ export function FormularioAlta() {
         <Casilla
           name="es_zhensi"
           defaultChecked
-          etiqueta="Zhensi"
+          etiqueta="Zhenshi"
           ayuda="Da sesiones y captura su disponibilidad."
         />
         <Casilla
