@@ -149,8 +149,3 @@ suele ser más útil que la lista de lo que sí hace.
 - El contador de apoyos se puede inflar borrando las cookies del navegador.
 - Falta la cabecera que bloquea scripts ajenos (CSP).
 
-## Licencia
-
-Todavía no tiene. Sin una licencia, legalmente nadie puede reutilizar el
-código, aunque esté a la vista. Si quieres que otras escuelas lo copien, hace
-falta agregar una.
