@@ -5,6 +5,9 @@ import { Seccion } from "@/components/ui/Seccion";
 import { auth } from "@/lib/auth";
 import { FormularioAlta } from "./FormularioAlta";
 import { CambioContrasena } from "./CambioContrasena";
+import { BotonAccion } from "@/components/ui/BotonAccion";
+import { alternarActivo } from "@/app/admin/zhensis/acciones";
+import { BorrarCuenta } from "@/app/admin/zhensis/BorrarCuenta";
 
 export const dynamic = "force-dynamic";
 
@@ -71,16 +74,40 @@ export default async function PaginaUsuarios() {
                         <Etiqueta tono="dorado">admin</Etiqueta>
                       ) : null}
                       {!cuenta.activo ? (
-                        <Etiqueta tono="alerta">inactivo</Etiqueta>
+                        <Etiqueta tono="apagado">archivada</Etiqueta>
                       ) : null}
                     </div>
                   </div>
 
-                  <CambioContrasena
-                    id={cuenta.id}
-                    nombre={cuenta.nombre}
-                    esTuya={cuenta.id === sesion?.user.id}
-                  />
+                  <div className="flex flex-wrap items-center gap-3">
+                    <CambioContrasena
+                      id={cuenta.id}
+                      nombre={cuenta.nombre}
+                      esTuya={cuenta.id === sesion?.user.id}
+                    />
+
+                    {cuenta.id === sesion?.user.id ? null : (
+                      <>
+                        <form action={alternarActivo}>
+                          <input type="hidden" name="id" value={cuenta.id} />
+                          <BotonAccion
+                            type="submit"
+                            tono={cuenta.activo ? "peligro" : "afirmar"}
+                          >
+                            {cuenta.activo ? "Archivar" : "Reactivar"}
+                          </BotonAccion>
+                        </form>
+
+                        {!cuenta.activo ? (
+                          <BorrarCuenta
+                            id={cuenta.id}
+                            nombre={cuenta.nombre}
+                            usuario={cuenta.usuario}
+                          />
+                        ) : null}
+                      </>
+                    )}
+                  </div>
                 </Tarjeta>
               </li>
             ))}
