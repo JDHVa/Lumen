@@ -159,12 +159,15 @@ model solicitud {
   apoyos             Int              @default(0)
   estado             estado_solicitud @default(abierta)
   sesion_id          String?          @unique
+  reportes_error     Int              @default(0)
+  reportada_en       DateTime?
   creada_en          DateTime         @default(now())
 
   materia          materia?          @relation(fields: [materia_id], references: [id])
   carrera          carrera?          @relation(fields: [carrera_id], references: [id])
   sesion           sesion?           @relation("solicitud_agendada", fields: [sesion_id], references: [id])
   apoyos_registros apoyo_solicitud[]
+  reportes         reporte_error_solicitud[]
 
   @@map("solicitud")
 }
@@ -179,6 +182,18 @@ model apoyo_solicitud {
 
   @@unique([solicitud_id, huella])
   @@map("apoyo_solicitud")
+}
+
+model reporte_error_solicitud {
+  id           String   @id @default(uuid())
+  solicitud_id String
+  huella       String
+  creado_en    DateTime @default(now())
+
+  solicitud solicitud @relation(fields: [solicitud_id], references: [id], onDelete: Cascade)
+
+  @@unique([solicitud_id, huella])
+  @@map("reporte_error_solicitud")
 }
 
 model sesion {

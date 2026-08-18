@@ -13,6 +13,7 @@ import {
   usarAlternadores,
 } from "@/components/CuadriculaHorarios";
 import type { CarreraLista, MateriaLista } from "@/app/admin/catalogo/tipos";
+import { ReportarError } from "@/app/solicitudes/ReportarError";
 import { crearSolicitud, type EstadoSolicitud } from "./acciones";
 
 const estadoInicial: EstadoSolicitud = {};
@@ -67,6 +68,12 @@ export function FormularioAyuda({
             Volver al inicio
           </BotonEnlace>
         </div>
+
+        {estado.id ? (
+          <div className="w-full max-w-sm border-t border-marino/10 pt-5">
+            <ReportarError solicitudId={estado.id} />
+          </div>
+        ) : null}
       </Tarjeta>
     );
   }

@@ -9,6 +9,7 @@ import { asegurarHuella, revisarTope, registrarEnvio } from "@/lib/huella";
 export type EstadoSolicitud = {
   error?: string;
   codigo?: string;
+  id?: string;
 };
 
 const LARGO_DESCRIPCION = 500;
@@ -115,5 +116,5 @@ export async function crearSolicitud(
 
   revalidatePath("/solicitudes");
 
-  return { codigo: creada.codigo_publico };
+  return { codigo: creada.codigo_publico, id: creada.id };
 }

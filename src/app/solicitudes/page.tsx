@@ -10,6 +10,7 @@ import { leerHuella } from "@/lib/huella";
 import { leerClaveBloque, nombreDia, etiquetaDeBloque } from "@/lib/horarios";
 import { Filtros } from "./Filtros";
 import { apoyar } from "./acciones";
+import { ReportarError } from "./ReportarError";
 
 export const dynamic = "force-dynamic";
 
@@ -86,17 +87,29 @@ export default async function PaginaSolicitudes({
     cuantas: carrera._count.materias,
   }));
 
-  const mios = huella
-    ? await db.apoyo_solicitud.findMany({
-        where: {
-          huella,
-          solicitud_id: { in: solicitudes.map((s) => s.id) },
-        },
-        select: { solicitud_id: true },
-      })
-    : [];
+  const vacio: { solicitud_id: string }[] = [];
+
+  const [mios, reportadas] = huella
+    ? await Promise.all([
+        db.apoyo_solicitud.findMany({
+          where: {
+            huella,
+            solicitud_id: { in: solicitudes.map((s) => s.id) },
+          },
+          select: { solicitud_id: true },
+        }),
+        db.reporte_error_solicitud.findMany({
+          where: {
+            huella,
+            solicitud_id: { in: solicitudes.map((s) => s.id) },
+          },
+          select: { solicitud_id: true },
+        }),
+      ])
+    : [vacio, vacio];
 
   const yaApoyadas = new Set(mios.map((fila) => fila.solicitud_id));
+  const yaReportadas = new Set(reportadas.map((fila) => fila.solicitud_id));
 
   const hayBusqueda = Boolean(parametros.codigo || carreraFiltro);
 
@@ -214,6 +227,15 @@ export default async function PaginaSolicitudes({
                           con su día y su salón.
                         </p>
                       )}
+
+                      {solicitud.estado === "abierta" ? (
+                        <div className="border-t border-marino/10 pt-2">
+                          <ReportarError
+                            solicitudId={solicitud.id}
+                            yaReportada={yaReportadas.has(solicitud.id)}
+                          />
+                        </div>
+                      ) : null}
                     </Tarjeta>
                   </li>
                 );

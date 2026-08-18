@@ -16,7 +16,7 @@ const enlaces = [
   { href: "/admin/zhensis", texto: "Zhenshis" },
 ];
 
-export function NavegacionAdmin() {
+export function NavegacionAdmin({ avisos = 0 }: { avisos?: number }) {
   const ruta = usePathname();
 
   return (
@@ -39,6 +39,14 @@ export function NavegacionAdmin() {
               }`}
             >
               {enlace.texto}
+              {enlace.href === "/admin/solicitudes" && avisos > 0 ? (
+                <span
+                  className="ml-1.5 inline-flex min-w-[18px] items-center justify-center rounded-full bg-alerta px-1.5 py-0.5 text-[11px] font-bold text-white"
+                  aria-label={`${avisos} solicitudes reportadas como error`}
+                >
+                  {avisos}
+                </span>
+              ) : null}
             </Link>
           );
         })}

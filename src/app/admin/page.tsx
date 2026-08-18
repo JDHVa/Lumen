@@ -1,7 +1,15 @@
+import { db } from "@/lib/db";
 import { BotonEnlace } from "@/components/ui/Boton";
 import { Tarjeta } from "@/components/ui/Tarjeta";
+import { Etiqueta } from "@/components/ui/Etiqueta";
 
-export default function PaginaAdmin() {
+export const dynamic = "force-dynamic";
+
+export default async function PaginaAdmin() {
+  const reportadas = await db.solicitud.count({
+    where: { reportes_error: { gt: 0 }, estado: { not: "agendada" } },
+  });
+
   return (
     <div className="flex flex-col gap-7">
       <div className="flex flex-col gap-2">
@@ -11,6 +19,26 @@ export default function PaginaAdmin() {
           llegan en las siguientes fases.
         </p>
       </div>
+
+      {reportadas > 0 ? (
+        <Tarjeta
+          elevada
+          className="flex flex-wrap items-center justify-between gap-4 border-alerta/40 bg-alerta-tenue"
+        >
+          <div className="flex flex-col items-start gap-2">
+            <Etiqueta tono="alerta">urgente</Etiqueta>
+            <h2 className="text-xl font-semibold">
+              {reportadas === 1
+                ? "Hay 1 solicitud que mandaron por error"
+                : `Hay ${reportadas} solicitudes que mandaron por error`}
+            </h2>
+            <p className="text-sm text-tinta-suave">
+              Alguien avisó que se equivocó. Entra a revisarlas y bórralas.
+            </p>
+          </div>
+          <BotonEnlace href="/admin/solicitudes">Revisar</BotonEnlace>
+        </Tarjeta>
+      ) : null}
 
       <div className="flex flex-col gap-3">
         <Tarjeta elevada className="flex flex-wrap items-center justify-between gap-4">

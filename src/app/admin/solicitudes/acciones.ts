@@ -31,3 +31,62 @@ export async function cambiarEstado(datos: FormData) {
   revalidatePath("/admin/solicitudes");
   revalidatePath("/solicitudes");
 }
+
+function refrescar() {
+  revalidatePath("/admin/solicitudes");
+  revalidatePath("/admin");
+  revalidatePath("/solicitudes");
+}
+
+export async function descartarReporte(datos: FormData) {
+  const sesion = await auth();
+  if (!sesion?.user.es_admin) return;
+
+  const id = String(datos.get("id") ?? "");
+  if (!id) return;
+
+  await db.$transaction([
+    db.reporte_error_solicitud.deleteMany({ where: { solicitud_id: id } }),
+    db.solicitud.updateMany({
+      where: { id },
+      data: { reportes_error: 0, reportada_en: null },
+    }),
+  ]);
+
+  refrescar();
+}
+
+export type EstadoBorrado = {
+  error?: string;
+};
+
+export async function borrarSolicitud(
+  _estado: EstadoBorrado,
+  datos: FormData,
+): Promise<EstadoBorrado> {
+  const sesion = await auth();
+  if (!sesion?.user.es_admin) return { error: "No tienes permiso." };
+
+  const id = String(datos.get("id") ?? "");
+  if (!id) return { error: "No encontramos esa solicitud." };
+
+  const solicitud = await db.solicitud.findUnique({
+    where: { id },
+    select: { id: true, estado: true },
+  });
+
+  if (!solicitud) return { error: "Esa solicitud ya no existe." };
+
+  if (solicitud.estado === "agendada") {
+    return {
+      error:
+        "Esta solicitud ya tiene sesión agendada. Cancela la sesión primero y luego bórrala.",
+    };
+  }
+
+  await db.solicitud.delete({ where: { id } });
+
+  refrescar();
+
+  return {};
+}
