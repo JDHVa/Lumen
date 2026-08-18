@@ -11,14 +11,23 @@ export default async function PaginaZhensi() {
   const sesion = await auth();
   if (!sesion?.user) return null;
 
-  const [materias, bloques, perfil] = await Promise.all([
-    db.zhensi_materia.count({ where: { usuario_id: sesion.user.id } }),
-    db.disponibilidad.count({ where: { usuario_id: sesion.user.id } }),
-    db.perfil_zhensi.findUnique({
-      where: { usuario_id: sesion.user.id },
-      select: { visible_publico: true },
-    }),
-  ]);
+  const [materias, bloques, sesiones, apuntes, abiertas, perfil] =
+    await Promise.all([
+      db.zhensi_materia.count({ where: { usuario_id: sesion.user.id } }),
+      db.disponibilidad.count({ where: { usuario_id: sesion.user.id } }),
+      db.sesion.count({
+        where: {
+          zhensi_id: sesion.user.id,
+          estado: { in: ["publicada", "realizada"] },
+        },
+      }),
+      db.apunte.count({ where: { zhensi_id: sesion.user.id } }),
+      db.solicitud.count({ where: { estado: "abierta" } }),
+      db.perfil_zhensi.findUnique({
+        where: { usuario_id: sesion.user.id },
+        select: { visible_publico: true },
+      }),
+    ]);
 
   const listas = [
     {
@@ -42,6 +51,39 @@ export default async function PaginaZhensi() {
             ? "1 bloque a la semana."
             : `${bloques} bloques a la semana.`,
       pendiente: bloques === 0,
+    },
+    {
+      titulo: "Mis sesiones",
+      href: "/zhensi/sesiones",
+      resumen:
+        sesiones === 0
+          ? "Todavía no tienes sesiones asignadas."
+          : sesiones === 1
+            ? "1 sesión asignada."
+            : `${sesiones} sesiones asignadas.`,
+      pendiente: false,
+    },
+    {
+      titulo: "Mis apuntes",
+      href: "/zhensi/apuntes",
+      resumen:
+        apuntes === 0
+          ? "Todavía no subes ningún apunte."
+          : apuntes === 1
+            ? "1 apunte publicado."
+            : `${apuntes} apuntes publicados.`,
+      pendiente: apuntes === 0,
+    },
+    {
+      titulo: "Solicitudes abiertas",
+      href: "/solicitudes",
+      resumen:
+        abiertas === 0
+          ? "Ahora mismo no hay solicitudes abiertas."
+          : abiertas === 1
+            ? "1 solicitud esperando."
+            : `${abiertas} solicitudes esperando.`,
+      pendiente: false,
     },
   ];
 

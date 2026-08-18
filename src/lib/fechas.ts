@@ -34,3 +34,25 @@ export function fechaLegible(fecha: Date) {
   const mes = String(fecha.getUTCMonth() + 1).padStart(2, "0");
   return `${nombreDia(diaSemanaDe(fecha))} ${dia}/${mes}`;
 }
+
+export function hoyEnFecha(ahora = new Date()) {
+  return new Date(
+    Date.UTC(ahora.getFullYear(), ahora.getMonth(), ahora.getDate()),
+  );
+}
+
+export function yaTermino(
+  sesion: { fecha: Date; hora_fin: string },
+  ahora = new Date(),
+) {
+  const hoy = hoyEnFecha(ahora);
+
+  if (sesion.fecha.getTime() < hoy.getTime()) return true;
+  if (sesion.fecha.getTime() > hoy.getTime()) return false;
+
+  const [hora, minuto] = sesion.hora_fin.split(":").map(Number);
+  if (Number.isNaN(hora)) return false;
+
+  const fin = hora * 60 + (Number.isNaN(minuto) ? 0 : minuto);
+  return fin <= ahora.getHours() * 60 + ahora.getMinutes();
+}

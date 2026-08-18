@@ -10,7 +10,7 @@ import {
   etiquetaDeBloque,
   esEnLinea,
 } from "@/lib/horarios";
-import { diaSemanaDe, fechaLegible } from "@/lib/fechas";
+import { diaSemanaDe, fechaLegible, hoyEnFecha, yaTermino } from "@/lib/fechas";
 import { ligaWhatsapp } from "@/lib/contacto";
 import { db } from "@/lib/db";
 
@@ -44,20 +44,18 @@ const pasos = [
 ];
 
 export default async function PaginaInicio() {
-  const hoy = new Date();
-  const desde = new Date(
-    Date.UTC(hoy.getFullYear(), hoy.getMonth(), hoy.getDate()),
-  );
+  const ahora = new Date();
 
-  const proximas = await db.sesion.findMany({
-    where: { estado: "publicada", fecha: { gte: desde } },
+  const agendadas = await db.sesion.findMany({
+    where: { estado: "publicada", fecha: { gte: hoyEnFecha(ahora) } },
     orderBy: [{ fecha: "asc" }, { hora_inicio: "asc" }],
-    take: 8,
+    take: 24,
     select: {
       id: true,
       titulo: true,
       fecha: true,
       hora_inicio: true,
+      hora_fin: true,
       salon: true,
       notas_publicas: true,
       zhensi: {
@@ -69,6 +67,10 @@ export default async function PaginaInicio() {
       },
     },
   });
+
+  const proximas = agendadas
+    .filter((una) => !yaTermino(una, ahora))
+    .slice(0, 8);
 
   const porDia: {
     etiqueta: string;

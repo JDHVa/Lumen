@@ -7,31 +7,42 @@ import { Seccion } from "@/components/ui/Seccion";
 import { BotonAccion } from "@/components/ui/BotonAccion";
 import { alternarActivo } from "./acciones";
 import { BorrarCuenta } from "./BorrarCuenta";
+import { MapaCalor } from "./MapaCalor";
 
 export const dynamic = "force-dynamic";
 
 export default async function PaginaZhensis() {
   const sesion = await auth();
 
-  const zhensis = await db.usuario.findMany({
-    where: { es_zhensi: true },
-    orderBy: { nombre: "asc" },
-    select: {
-      id: true,
-      nombre: true,
-      usuario: true,
-      activo: true,
-      es_admin: true,
-      perfil: {
-        select: {
-          visible_publico: true,
-          semestre: true,
-          carrera: { select: { clave: true } },
+  const [zhensis, disponibilidades] = await Promise.all([
+    db.usuario.findMany({
+      where: { es_zhensi: true },
+      orderBy: { nombre: "asc" },
+      select: {
+        id: true,
+        nombre: true,
+        usuario: true,
+        activo: true,
+        es_admin: true,
+        perfil: {
+          select: {
+            visible_publico: true,
+            semestre: true,
+            carrera: { select: { clave: true } },
+          },
         },
+        _count: { select: { materias: true, disponibilidades: true } },
       },
-      _count: { select: { materias: true, disponibilidades: true } },
-    },
-  });
+    }),
+    db.disponibilidad.findMany({
+      where: { usuario: { es_zhensi: true, activo: true } },
+      select: {
+        dia_semana: true,
+        hora_inicio: true,
+        usuario: { select: { nombre: true } },
+      },
+    }),
+  ]);
 
   const activos = zhensis.filter((zhensi) => zhensi.activo);
   const archivados = zhensis.filter((zhensi) => !zhensi.activo);
@@ -49,6 +60,19 @@ export default async function PaginaZhensis() {
           desaparece de esta lista y de la galería pública.
         </p>
       </div>
+
+      <Seccion
+        titulo="Mapa de horarios"
+        descripcion="Cuántos zhenshis activos tienen libre cada bloque. Entre más oscuro, más gente puede. Pasa el cursor o toca un bloque para ver quiénes son."
+      >
+        <MapaCalor
+          disponibilidades={disponibilidades.map((una) => ({
+            dia_semana: una.dia_semana,
+            hora_inicio: una.hora_inicio,
+            nombre: una.usuario.nombre,
+          }))}
+        />
+      </Seccion>
 
       <Seccion
         titulo="Activos"

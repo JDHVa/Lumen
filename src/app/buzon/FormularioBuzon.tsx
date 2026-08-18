@@ -77,11 +77,7 @@ export function FormularioBuzon() {
             key={opcion.valor}
             type="button"
             onClick={() => setCategoria(opcion.valor)}
-            className={`flex flex-col gap-2 rounded-tarjeta border p-6 text-left shadow-tarjeta transition-colors ${
-              opcion.valor === "apoyo"
-                ? "border-dorado/50 bg-dorado-tenue hover:border-dorado"
-                : "border-marino/15 bg-white hover:border-marino/45"
-            }`}
+            className="flex flex-col gap-2 rounded-tarjeta border border-marino/15 bg-white p-6 text-left shadow-tarjeta transition-colors hover:border-marino/45"
           >
             <span className="font-titulos text-xl font-semibold text-marino">
               {opcion.titulo}

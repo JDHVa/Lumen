@@ -2,7 +2,7 @@ import { db } from "@/lib/db";
 import { resumirSesiones, diasDeEspera, horasDe, conUnDecimal } from "@/lib/metricas";
 
 export async function cargarMetricas() {
-  const [realizadas, solicitudes, cuentas] = await Promise.all([
+  const [realizadas, agendadas, ajustes, solicitudes, cuentas] = await Promise.all([
     db.sesion.findMany({
       where: { estado: "realizada" },
       select: {
@@ -15,6 +15,26 @@ export async function cargarMetricas() {
         materia: { select: { nombre: true } },
         titulo: true,
         asistencia: { select: { cantidad: true } },
+      },
+    }),
+    db.sesion.findMany({
+      where: { estado: "publicada" },
+      select: {
+        hora_inicio: true,
+        hora_fin: true,
+        zhensi_id: true,
+        zhensi: { select: { nombre: true } },
+      },
+    }),
+    db.ajuste_horas.findMany({
+      orderBy: { creado_en: "desc" },
+      select: {
+        id: true,
+        minutos: true,
+        motivo: true,
+        creado_en: true,
+        zhensi_id: true,
+        zhensi: { select: { nombre: true } },
       },
     }),
     db.solicitud.findMany({
@@ -44,7 +64,20 @@ export async function cargarMetricas() {
     total: mensajes.length,
   };
 
-  const resumen = resumirSesiones(realizadas);
+  const base = resumirSesiones(realizadas);
+
+  const minutosAjustados = ajustes.reduce((suma, uno) => suma + uno.minutos, 0);
+
+  const resumen = {
+    ...base,
+    horasDadas: base.horas,
+    horasAgendadas: conUnDecimal(horasDe(agendadas)),
+    horasAjustadas: conUnDecimal(minutosAjustados / 60),
+    horas: conUnDecimal(
+      horasDe(realizadas) + horasDe(agendadas) + minutosAjustados / 60,
+    ),
+    agendadas: agendadas.length,
+  };
 
   const porZhenshi = new Map<
     string,
@@ -62,6 +95,28 @@ export async function cargarMetricas() {
     previo.horas += horasDe([una]);
     previo.asistentes += una.asistencia?.cantidad ?? 0;
     porZhenshi.set(una.zhensi_id, previo);
+  }
+
+  for (const una of agendadas) {
+    const previo = porZhenshi.get(una.zhensi_id) ?? {
+      nombre: una.zhensi.nombre,
+      sesiones: 0,
+      horas: 0,
+      asistentes: 0,
+    };
+    previo.horas += horasDe([una]);
+    porZhenshi.set(una.zhensi_id, previo);
+  }
+
+  for (const uno of ajustes) {
+    const previo = porZhenshi.get(uno.zhensi_id) ?? {
+      nombre: uno.zhensi.nombre,
+      sesiones: 0,
+      horas: 0,
+      asistentes: 0,
+    };
+    previo.horas += uno.minutos / 60;
+    porZhenshi.set(uno.zhensi_id, previo);
   }
 
   const zhenshis = [...porZhenshi.values()]
@@ -104,6 +159,7 @@ export async function cargarMetricas() {
     pedidas,
     porEstado,
     espera,
+    ajustes,
     zhenshisRegistrados: cuentas,
     totalSolicitudes: solicitudes.length,
     buzon,

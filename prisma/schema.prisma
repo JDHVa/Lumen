@@ -56,6 +56,8 @@ model usuario {
   asistencias          asistencia[]     @relation("asistencia_capturada_por")
   apuntes              apunte[]         @relation("apunte_zhensi")
   mensajes_atendidos   mensaje_buzon[]  @relation("buzon_atendido_por")
+  ajustes_horas        ajuste_horas[]   @relation("ajuste_zhensi")
+  ajustes_creados      ajuste_horas[]   @relation("ajuste_creador")
 
   @@map("usuario")
 }
@@ -242,4 +244,18 @@ model mensaje_buzon {
   atendedor usuario? @relation("buzon_atendido_por", fields: [atendido_por], references: [id])
 
   @@map("mensaje_buzon")
+}
+
+model ajuste_horas {
+  id         String   @id @default(uuid())
+  zhensi_id  String
+  minutos    Int
+  motivo     String
+  creado_por String
+  creado_en  DateTime @default(now())
+
+  zhensi  usuario @relation("ajuste_zhensi", fields: [zhensi_id], references: [id], onDelete: Cascade)
+  creador usuario @relation("ajuste_creador", fields: [creado_por], references: [id])
+
+  @@map("ajuste_horas")
 }

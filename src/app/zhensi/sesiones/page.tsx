@@ -5,7 +5,7 @@ import { Tarjeta } from "@/components/ui/Tarjeta";
 import { Etiqueta } from "@/components/ui/Etiqueta";
 import { Seccion } from "@/components/ui/Seccion";
 import { etiquetaDeBloque, esEnLinea } from "@/lib/horarios";
-import { diaSemanaDe, fechaLegible } from "@/lib/fechas";
+import { diaSemanaDe, fechaLegible, yaTermino } from "@/lib/fechas";
 import { horasDe, conUnDecimal } from "@/lib/metricas";
 
 export const dynamic = "force-dynamic";
@@ -14,10 +14,7 @@ export default async function PaginaMisSesiones() {
   const sesion = await auth();
   if (!sesion?.user) redirect("/iniciarsesion?regresar=/zhensi/sesiones");
 
-  const hoy = new Date();
-  const desde = new Date(
-    Date.UTC(hoy.getFullYear(), hoy.getMonth(), hoy.getDate()),
-  );
+  const ahora = new Date();
 
   const todas = await db.sesion.findMany({
     where: {
@@ -38,11 +35,17 @@ export default async function PaginaMisSesiones() {
     },
   });
 
-  const proximas = todas.filter((una) => una.fecha >= desde);
-  const pasadas = todas.filter((una) => una.fecha < desde).reverse();
+  const proximas = todas.filter((una) => !yaTermino(una, ahora));
+  const pasadas = todas.filter((una) => yaTermino(una, ahora)).reverse();
+
+  const ajustes = await db.ajuste_horas.findMany({
+    where: { zhensi_id: sesion.user.id },
+    select: { minutos: true },
+  });
 
   const realizadas = todas.filter((una) => una.estado === "realizada");
-  const horas = conUnDecimal(horasDe(realizadas));
+  const minutosAjustados = ajustes.reduce((suma, uno) => suma + uno.minutos, 0);
+  const horas = conUnDecimal(horasDe(todas) + minutosAjustados / 60);
   const atendidos = realizadas.reduce(
     (suma, una) => suma + (una.asistencia?.cantidad ?? 0),
     0,
@@ -95,7 +98,7 @@ export default async function PaginaMisSesiones() {
         </p>
       </div>
 
-      {realizadas.length > 0 ? (
+      {todas.length > 0 ? (
         <div className="grid gap-3 sm:grid-cols-3">
           <Tarjeta className="flex flex-col gap-1 py-5">
             <span className="font-titulos text-3xl font-bold text-marino">
@@ -105,7 +108,7 @@ export default async function PaginaMisSesiones() {
               Horas acumuladas
             </span>
             <span className="text-xs text-tinta-suave">
-              Se calculan solas de tus sesiones dadas
+              Se calculan solas de tus sesiones asignadas
             </span>
           </Tarjeta>
           <Tarjeta className="flex flex-col gap-1 py-5">

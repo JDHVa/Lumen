@@ -39,7 +39,7 @@ export async function GET(peticion: Request) {
         ["Sesiones realizadas este mes", datos.resumen.mes],
         ["Sesiones realizadas en total", datos.resumen.total],
         ["Schüler atendidos", datos.resumen.asistentes],
-        ["Horas de mentoría", datos.resumen.horas],
+        ["Horas de servicio", datos.resumen.horas],
         ["Zhenshis con sesiones dadas", datos.resumen.zhenshisActivos],
         ["Zhenshis registrados y activos", datos.zhenshisRegistrados],
         ["Promedio de asistentes por sesión", datos.resumen.promedioPorSesion],

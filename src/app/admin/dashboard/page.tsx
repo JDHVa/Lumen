@@ -1,7 +1,12 @@
 import { Tarjeta } from "@/components/ui/Tarjeta";
 import { Etiqueta } from "@/components/ui/Etiqueta";
 import { Seccion } from "@/components/ui/Seccion";
+import { db } from "@/lib/db";
+import { BotonAccion } from "@/components/ui/BotonAccion";
+import { conUnDecimal } from "@/lib/metricas";
 import { cargarMetricas } from "./datos";
+import { AjusteHoras } from "./AjusteHoras";
+import { borrarAjuste } from "./acciones";
 
 export const dynamic = "force-dynamic";
 
@@ -37,15 +42,23 @@ function Descarga({ tabla, texto }: { tabla: string; texto: string }) {
 }
 
 export default async function PaginaDashboard() {
-  const datos = await cargarMetricas();
+  const [datos, zhensis] = await Promise.all([
+    cargarMetricas(),
+    db.usuario.findMany({
+      where: { es_zhensi: true, activo: true },
+      orderBy: { nombre: "asc" },
+      select: { id: true, nombre: true },
+    }),
+  ]);
 
   return (
     <div className="flex flex-col gap-9">
       <div className="flex flex-col gap-2">
         <h1 className="text-3xl font-bold">Dashboard</h1>
         <p className="leading-relaxed text-tinta-suave">
-          Solo cuentan las sesiones marcadas como realizadas. Las horas no se
-          capturan: se calculan sumando la duración de esas sesiones.
+          Las sesiones cuentan desde que se asignan. Las horas se calculan
+          sumando la duración de las sesiones agendadas y dadas, más los
+          ajustes que capturas abajo.
         </p>
       </div>
 
@@ -65,8 +78,8 @@ export default async function PaginaDashboard() {
           />
           <Numero
             valor={datos.resumen.horas}
-            etiqueta="Horas de mentoría"
-            nota="Calculadas, nunca capturadas"
+            etiqueta="Horas de servicio"
+            nota={`${datos.resumen.horasDadas} dadas, ${datos.resumen.horasAgendadas} agendadas, ${datos.resumen.horasAjustadas} de ajustes`}
           />
           <Numero
             valor={datos.resumen.promedioPorSesion}
@@ -113,7 +126,7 @@ export default async function PaginaDashboard() {
       >
         {datos.zhenshis.length === 0 ? (
           <Tarjeta className="py-10 text-center text-sm text-tinta-suave">
-            Nadie ha dado una sesión todavía.
+            Nadie tiene sesiones ni ajustes todavía.
           </Tarjeta>
         ) : (
           <ul className="flex flex-col gap-2.5">
@@ -132,6 +145,42 @@ export default async function PaginaDashboard() {
                     {fila.asistentes} atendidos
                   </span>
                   <Etiqueta tono="dorado">{fila.horas} h</Etiqueta>
+                </Tarjeta>
+              </li>
+            ))}
+          </ul>
+        )}
+      </Seccion>
+
+      <Seccion
+        titulo="Ajustes de horas"
+        descripcion="Para cuando una sesión duró más o menos de lo que dice su horario."
+      >
+        <AjusteHoras zhensis={zhensis} />
+
+        {datos.ajustes.length === 0 ? (
+          <Tarjeta className="py-10 text-center text-sm text-tinta-suave">
+            Todavía no hay ajustes capturados.
+          </Tarjeta>
+        ) : (
+          <ul className="flex flex-col gap-2.5">
+            {datos.ajustes.map((uno) => (
+              <li key={uno.id}>
+                <Tarjeta className="flex flex-wrap items-center gap-x-4 gap-y-2 py-4">
+                  <span className="min-w-0 flex-1 truncate font-medium text-marino">
+                    {uno.zhensi.nombre}
+                  </span>
+                  <span className="min-w-0 flex-1 truncate text-sm text-tinta-suave">
+                    {uno.motivo}
+                  </span>
+                  <Etiqueta tono={uno.minutos < 0 ? "apagado" : "dorado"}>
+                    {uno.minutos > 0 ? "+" : ""}
+                    {conUnDecimal(uno.minutos / 60)} h
+                  </Etiqueta>
+                  <form action={borrarAjuste}>
+                    <input type="hidden" name="id" value={uno.id} />
+                    <BotonAccion tono="peligro">Quitar</BotonAccion>
+                  </form>
                 </Tarjeta>
               </li>
             ))}
