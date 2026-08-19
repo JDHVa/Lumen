@@ -56,6 +56,7 @@ export default async function PaginaSolicitudes({
     db.solicitud.findMany({
       where: {
         estado: { in: ["abierta", "agendada"] },
+        archivada: false,
         ...(codigoBuscado ? { codigo_publico: codigoBuscado } : {}),
         ...(carreraFiltro && !codigoBuscado
           ? { carrera_id: carreraFiltro }

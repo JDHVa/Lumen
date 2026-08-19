@@ -7,7 +7,11 @@ export const dynamic = "force-dynamic";
 
 export default async function PaginaAdmin() {
   const reportadas = await db.solicitud.count({
-    where: { reportes_error: { gt: 0 }, estado: { not: "agendada" } },
+    where: {
+      reportes_error: { gt: 0 },
+      estado: { not: "agendada" },
+      archivada: false,
+    },
   });
 
   return (

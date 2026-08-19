@@ -5,7 +5,7 @@ import { Seccion } from "@/components/ui/Seccion";
 import { BotonAccion } from "@/components/ui/BotonAccion";
 import { leerClaveBloque, nombreDia, etiquetaDeBloque } from "@/lib/horarios";
 import { fechaLegible } from "@/lib/fechas";
-import { cambiarEstado, descartarReporte } from "./acciones";
+import { cambiarEstado, descartarReporte, cambiarArchivo } from "./acciones";
 import { BorrarSolicitud } from "./BorrarSolicitud";
 
 export const dynamic = "force-dynamic";
@@ -15,6 +15,13 @@ const tonos = {
   agendada: "dorado",
   cerrada: "apagado",
   oculta: "alerta",
+} as const;
+
+const fondos = {
+  abierta: "border-marino/25 bg-white",
+  agendada: "border-dorado/45 bg-dorado-tenue",
+  cerrada: "border-marino/10 bg-arena-honda",
+  oculta: "border-marino/10 bg-arena-honda opacity-70",
 } as const;
 
 type SolicitudAdmin = {
@@ -29,6 +36,8 @@ type SolicitudAdmin = {
   creada_en: Date;
   reportes_error: number;
   reportada_en: Date | null;
+  archivada: boolean;
+  archivada_en: Date | null;
   materia: { nombre: string } | null;
   carrera: { clave: string } | null;
 };
@@ -73,6 +82,18 @@ function Accion({
   );
 }
 
+function Archivo({ id, archivada }: { id: string; archivada: boolean }) {
+  return (
+    <form action={cambiarArchivo}>
+      <input type="hidden" name="id" value={id} />
+      <input type="hidden" name="archivar" value={archivada ? "no" : "si"} />
+      <BotonAccion type="submit">
+        {archivada ? "Desarchivar" : "Archivar"}
+      </BotonAccion>
+    </form>
+  );
+}
+
 function FilaSolicitud({ solicitud }: { solicitud: SolicitudAdmin }) {
   const franjas = resumirFranjas(solicitud.franjas_preferidas);
   const reportada = solicitud.reportes_error > 0;
@@ -80,7 +101,7 @@ function FilaSolicitud({ solicitud }: { solicitud: SolicitudAdmin }) {
   return (
     <Tarjeta
       className={`flex flex-col gap-3 py-4 ${
-        reportada ? "border-alerta/40 bg-alerta-tenue" : ""
+        reportada ? "border-alerta/40 bg-alerta-tenue" : fondos[solicitud.estado]
       }`}
     >
       <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
@@ -92,6 +113,9 @@ function FilaSolicitud({ solicitud }: { solicitud: SolicitudAdmin }) {
               ? "avisaron que fue un error"
               : `${solicitud.reportes_error} avisos de error`}
           </Etiqueta>
+        ) : null}
+        {solicitud.archivada ? (
+          <Etiqueta tono="apagado">archivada</Etiqueta>
         ) : null}
         {solicitud.carrera ? (
           <span className="text-sm text-tinta-suave">
@@ -129,39 +153,52 @@ function FilaSolicitud({ solicitud }: { solicitud: SolicitudAdmin }) {
 
       {solicitud.estado === "agendada" ? (
         <p className="text-sm text-tinta-suave">
-          Ya tiene sesión. Se administra desde Sesiones.
+          Ya tiene sesión. Se administra desde Sesiones.{" "}
+          {solicitud.archivada
+            ? "Está archivada: ya no sale en la lista pública."
+            : "Si ya no quieres que siga saliendo en la lista pública, archívala."}
         </p>
-      ) : (
-        <div className="flex flex-wrap items-center gap-4">
-          {solicitud.estado !== "abierta" ? (
-            <Accion id={solicitud.id} destino="abierta" texto="Reabrir" />
-          ) : null}
-          {solicitud.estado !== "cerrada" ? (
-            <Accion id={solicitud.id} destino="cerrada" texto="Cerrar" />
-          ) : null}
-          {solicitud.estado !== "oculta" ? (
-            <Accion
-              id={solicitud.id}
-              destino="oculta"
-              texto="Ocultar"
-              tono="peligro"
-            />
-          ) : null}
-          {reportada ? (
-            <form action={descartarReporte}>
-              <input type="hidden" name="id" value={solicitud.id} />
-              <BotonAccion type="submit" tono="afirmar">
-                Descartar aviso
-              </BotonAccion>
-            </form>
-          ) : null}
+      ) : null}
+
+      <div className="flex flex-wrap items-center gap-4">
+        {solicitud.estado === "agendada" ? null : (
+          <>
+            {solicitud.estado !== "abierta" ? (
+              <Accion id={solicitud.id} destino="abierta" texto="Reabrir" />
+            ) : null}
+            {solicitud.estado !== "cerrada" ? (
+              <Accion id={solicitud.id} destino="cerrada" texto="Cerrar" />
+            ) : null}
+            {solicitud.estado !== "oculta" ? (
+              <Accion
+                id={solicitud.id}
+                destino="oculta"
+                texto="Ocultar"
+                tono="peligro"
+              />
+            ) : null}
+          </>
+        )}
+
+        <Archivo id={solicitud.id} archivada={solicitud.archivada} />
+
+        {reportada ? (
+          <form action={descartarReporte}>
+            <input type="hidden" name="id" value={solicitud.id} />
+            <BotonAccion type="submit" tono="afirmar">
+              Descartar aviso
+            </BotonAccion>
+          </form>
+        ) : null}
+
+        {solicitud.estado === "agendada" ? null : (
           <BorrarSolicitud
             id={solicitud.id}
             codigo={solicitud.codigo_publico}
             apoyos={solicitud.apoyos}
           />
-        </div>
-      )}
+        )}
+      </div>
     </Tarjeta>
   );
 }
@@ -182,14 +219,24 @@ export default async function PaginaSolicitudes() {
       creada_en: true,
       reportes_error: true,
       reportada_en: true,
+      archivada: true,
+      archivada_en: true,
       materia: { select: { nombre: true } },
       carrera: { select: { clave: true } },
     },
   })) as SolicitudAdmin[];
 
-  const abiertas = solicitudes.filter((s) => s.estado === "abierta").length;
+  const activas = solicitudes.filter((s) => !s.archivada);
+  const archivadas = solicitudes
+    .filter((s) => s.archivada)
+    .sort(
+      (a, b) =>
+        (b.archivada_en?.getTime() ?? 0) - (a.archivada_en?.getTime() ?? 0),
+    );
 
-  const reportadas = solicitudes
+  const abiertas = activas.filter((s) => s.estado === "abierta").length;
+
+  const reportadas = activas
     .filter((s) => s.reportes_error > 0)
     .sort(
       (a, b) =>
@@ -228,15 +275,17 @@ export default async function PaginaSolicitudes() {
 
       <Seccion
         titulo="Todas"
-        descripcion={`${solicitudes.length} en total, ${abiertas} todavía abiertas.`}
+        descripcion={`${activas.length} sin archivar, ${abiertas} todavía abiertas.`}
       >
-        {solicitudes.length === 0 ? (
+        {activas.length === 0 ? (
           <Tarjeta className="py-10 text-center text-sm text-tinta-suave">
-            Todavía no hay solicitudes.
+            {solicitudes.length === 0
+              ? "Todavía no hay solicitudes."
+              : "Ya archivaste todas. Están más abajo."}
           </Tarjeta>
         ) : (
           <ul className="flex flex-col gap-2.5">
-            {solicitudes.map((solicitud) => (
+            {activas.map((solicitud) => (
               <li key={solicitud.id}>
                 <FilaSolicitud solicitud={solicitud} />
               </li>
@@ -244,6 +293,28 @@ export default async function PaginaSolicitudes() {
           </ul>
         )}
       </Seccion>
+
+      {archivadas.length > 0 ? (
+        <Seccion
+          titulo="Archivadas"
+          descripcion="Guardadas fuera del camino. No salen en la lista pública ni en Demanda. Puedes regresarlas cuando quieras."
+        >
+          <details className="group">
+            <summary className="inline-flex min-h-[40px] cursor-pointer items-center text-sm font-medium text-tinta-suave underline underline-offset-4 hover:text-marino">
+              {archivadas.length === 1
+                ? "Ver la solicitud archivada"
+                : `Ver las ${archivadas.length} archivadas`}
+            </summary>
+            <ul className="flex flex-col gap-2.5 pt-4">
+              {archivadas.map((solicitud) => (
+                <li key={solicitud.id}>
+                  <FilaSolicitud solicitud={solicitud} />
+                </li>
+              ))}
+            </ul>
+          </details>
+        </Seccion>
+      ) : null}
     </div>
   );
 }

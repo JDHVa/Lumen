@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 
 export default async function PaginaDemanda() {
   const solicitudes = await db.solicitud.findMany({
-    where: { estado: "abierta" },
+    where: { estado: "abierta", archivada: false },
     orderBy: [{ apoyos: "desc" }, { creada_en: "asc" }],
     take: 100,
     select: {

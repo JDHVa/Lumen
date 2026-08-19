@@ -28,13 +28,13 @@ export async function cambiarEstado(datos: FormData) {
     data: { estado: destino as EstadoPermitido },
   });
 
-  revalidatePath("/admin/solicitudes");
-  revalidatePath("/solicitudes");
+  refrescar();
 }
 
 function refrescar() {
   revalidatePath("/admin/solicitudes");
   revalidatePath("/admin");
+  revalidatePath("/admin/demanda");
   revalidatePath("/solicitudes");
 }
 
@@ -89,4 +89,24 @@ export async function borrarSolicitud(
   refrescar();
 
   return {};
+}
+
+export async function cambiarArchivo(datos: FormData) {
+  const sesion = await auth();
+  if (!sesion?.user.es_admin) return;
+
+  const id = String(datos.get("id") ?? "");
+  const archivar = String(datos.get("archivar") ?? "") === "si";
+
+  if (!id) return;
+
+  await db.solicitud.updateMany({
+    where: { id },
+    data: {
+      archivada: archivar,
+      archivada_en: archivar ? new Date() : null,
+    },
+  });
+
+  refrescar();
 }

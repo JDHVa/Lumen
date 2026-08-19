@@ -16,7 +16,11 @@ export default async function LayoutAdmin({
   if (!sesion.user.es_admin) redirect("/zhensi");
 
   const avisos = await db.solicitud.count({
-    where: { reportes_error: { gt: 0 }, estado: { not: "agendada" } },
+    where: {
+      reportes_error: { gt: 0 },
+      estado: { not: "agendada" },
+      archivada: false,
+    },
   });
 
   return (

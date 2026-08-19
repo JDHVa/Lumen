@@ -161,6 +161,8 @@ model solicitud {
   sesion_id          String?          @unique
   reportes_error     Int              @default(0)
   reportada_en       DateTime?
+  archivada          Boolean          @default(false)
+  archivada_en       DateTime?
   creada_en          DateTime         @default(now())
 
   materia          materia?          @relation(fields: [materia_id], references: [id])
