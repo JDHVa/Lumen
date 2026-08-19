@@ -6,13 +6,22 @@ import { Etiqueta } from "@/components/ui/Etiqueta";
 export const dynamic = "force-dynamic";
 
 export default async function PaginaAdmin() {
-  const reportadas = await db.solicitud.count({
-    where: {
-      reportes_error: { gt: 0 },
-      estado: { not: "agendada" },
-      archivada: false,
-    },
-  });
+  const [reportadas, propuestas] = await Promise.all([
+    db.solicitud.count({
+      where: {
+        reportes_error: { gt: 0 },
+        estado: { not: "agendada" },
+        archivada: false,
+      },
+    }),
+    db.solicitud.count({
+      where: {
+        estado: "abierta",
+        archivada: false,
+        propuestas: { some: {} },
+      },
+    }),
+  ]);
 
   return (
     <div className="flex flex-col gap-7">
@@ -41,6 +50,26 @@ export default async function PaginaAdmin() {
             </p>
           </div>
           <BotonEnlace href="/admin/solicitudes">Revisar</BotonEnlace>
+        </Tarjeta>
+      ) : null}
+
+      {propuestas > 0 ? (
+        <Tarjeta
+          elevada
+          className="flex flex-wrap items-center justify-between gap-4 border-dorado/50 bg-dorado-tenue"
+        >
+          <div className="flex flex-col items-start gap-2">
+            <Etiqueta tono="dorado">urgente</Etiqueta>
+            <h2 className="text-xl font-semibold">
+              {propuestas === 1
+                ? "Un zhenshi se propuso para dar una solicitud"
+                : `Hay ${propuestas} solicitudes donde algún zhenshi se propuso`}
+            </h2>
+            <p className="text-sm text-tinta-suave">
+              Levantaron la mano solos. Falta que tú las agendes.
+            </p>
+          </div>
+          <BotonEnlace href="/admin/demanda">Ver quién se propuso</BotonEnlace>
         </Tarjeta>
       ) : null}
 

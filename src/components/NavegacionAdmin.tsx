@@ -16,7 +16,13 @@ const enlaces = [
   { href: "/admin/zhensis", texto: "Zhenshis" },
 ];
 
-export function NavegacionAdmin({ avisos = 0 }: { avisos?: number }) {
+export function NavegacionAdmin({
+  avisos = 0,
+  propuestas = 0,
+}: {
+  avisos?: number;
+  propuestas?: number;
+}) {
   const ruta = usePathname();
 
   return (
@@ -39,6 +45,14 @@ export function NavegacionAdmin({ avisos = 0 }: { avisos?: number }) {
               }`}
             >
               {enlace.texto}
+              {enlace.href === "/admin/demanda" && propuestas > 0 ? (
+                <span
+                  className="ml-1.5 inline-flex min-w-[18px] items-center justify-center rounded-full bg-dorado px-1.5 py-0.5 text-[11px] font-bold text-marino-hondo"
+                  aria-label={`${propuestas} solicitudes donde alguien se propuso`}
+                >
+                  {propuestas}
+                </span>
+              ) : null}
               {enlace.href === "/admin/solicitudes" && avisos > 0 ? (
                 <span
                   className="ml-1.5 inline-flex min-w-[18px] items-center justify-center rounded-full bg-alerta px-1.5 py-0.5 text-[11px] font-bold text-white"

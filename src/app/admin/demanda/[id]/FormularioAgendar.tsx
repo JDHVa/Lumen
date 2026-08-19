@@ -19,6 +19,7 @@ export type OpcionBloque = {
 export type CandidatoVista = {
   id: string;
   nombre: string;
+  propuso: boolean;
   bloques: OpcionBloque[];
 };
 
@@ -74,8 +75,10 @@ export function FormularioAgendar({
         >
           {candidatos.map((candidato) => (
             <option key={candidato.id} value={candidato.id}>
+              {candidato.propuso ? "★ " : ""}
               {candidato.nombre} ({candidato.bloques.length}{" "}
               {candidato.bloques.length === 1 ? "horario" : "horarios"} en común)
+              {candidato.propuso ? " · se propuso" : ""}
             </option>
           ))}
         </Selector>

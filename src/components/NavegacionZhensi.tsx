@@ -7,6 +7,7 @@ const enlaces = [
   { href: "/zhensi", texto: "Inicio" },
   { href: "/zhensi/perfil", texto: "Mi perfil" },
   { href: "/zhensi/disponibilidad", texto: "Mi disponibilidad" },
+  { href: "/zhensi/solicitudes", texto: "Solicitudes" },
   { href: "/zhensi/sesiones", texto: "Mis sesiones" },
   { href: "/zhensi/apuntes", texto: "Mis apuntes" },
 ];

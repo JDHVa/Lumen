@@ -33,6 +33,15 @@ export default async function PaginaAgendar({
       franjas_preferidas: true,
       materia: { select: { nombre: true } },
       carrera: { select: { clave: true, nombre: true } },
+      propuestas: {
+        orderBy: { creada_en: "asc" },
+        select: {
+          id: true,
+          mensaje: true,
+          creada_en: true,
+          zhensi: { select: { id: true, nombre: true, activo: true } },
+        },
+      },
     },
   });
 
@@ -64,9 +73,14 @@ export default async function PaginaAgendar({
     })),
   );
 
+  const propuestos = new Set(
+    solicitud.propuestas.map((propuesta) => propuesta.zhensi.id),
+  );
+
   const paraFormulario: CandidatoVista[] = candidatos.map((candidato) => ({
     id: candidato.id,
     nombre: candidato.nombre,
+    propuso: propuestos.has(candidato.id),
     bloques: candidato.coincidencias
       .map((clave) => {
         const bloque = leerClaveBloque(clave);
@@ -80,6 +94,10 @@ export default async function PaginaAgendar({
       })
       .filter((bloque) => bloque !== null),
   }));
+
+  paraFormulario.sort(
+    (a, b) => Number(b.propuso) - Number(a.propuso),
+  );
 
   const nombreCosa =
     solicitud.tipo === "materia"
@@ -139,6 +157,51 @@ export default async function PaginaAgendar({
         ) : null}
       </Tarjeta>
 
+      {solicitud.propuestas.length > 0 ? (
+        <Seccion
+          titulo="Se propusieron"
+          descripcion="Levantaron la mano solos desde su panel. Tú sigues decidiendo quién la da."
+        >
+          <ul className="flex flex-col gap-2.5">
+            {solicitud.propuestas.map((propuesta) => {
+              const cruza = candidatos.some(
+                (candidato) => candidato.id === propuesta.zhensi.id,
+              );
+
+              return (
+                <li key={propuesta.id}>
+                  <Tarjeta className="flex flex-col gap-2 border-dorado/50 bg-dorado-tenue py-4">
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+                      <span className="font-medium text-marino">
+                        {propuesta.zhensi.nombre}
+                      </span>
+                      {propuesta.zhensi.activo ? null : (
+                        <Etiqueta tono="alerta">cuenta archivada</Etiqueta>
+                      )}
+                      <span className="ml-auto text-sm text-tinta-suave">
+                        {fechaLegible(propuesta.creada_en)}
+                      </span>
+                    </div>
+
+                    {propuesta.mensaje ? (
+                      <p className="text-sm leading-relaxed break-words text-tinta-suave">
+                        “{propuesta.mensaje}”
+                      </p>
+                    ) : null}
+
+                    <span className="text-sm text-tinta-suave">
+                      {cruza
+                        ? "Sí coincide con los horarios que pidieron: sale abajo para agendarlo."
+                        : "No coincide con los horarios que pidieron, o no tiene la materia marcada. Si de todos modos va, agenda la sesión a mano desde Sesiones."}
+                    </span>
+                  </Tarjeta>
+                </li>
+              );
+            })}
+          </ul>
+        </Seccion>
+      ) : null}
+
       {solicitud.estado === "agendada" ? null : candidatos.length === 0 ? (
         <Seccion titulo="Quién puede darla">
           <Aviso tono="error">
@@ -163,9 +226,14 @@ export default async function PaginaAgendar({
               {candidatos.map((candidato) => (
                 <li key={candidato.id}>
                   <Tarjeta className="flex flex-col gap-1 py-4">
-                    <span className="font-medium text-marino">
-                      {candidato.nombre}
-                    </span>
+                    <div className="flex flex-wrap items-center gap-3">
+                      <span className="font-medium text-marino">
+                        {candidato.nombre}
+                      </span>
+                      {propuestos.has(candidato.id) ? (
+                        <Etiqueta tono="dorado">se propuso</Etiqueta>
+                      ) : null}
+                    </div>
                     <span className="text-sm text-tinta-suave">
                       Coincide en{" "}
                       {candidato.coincidencias

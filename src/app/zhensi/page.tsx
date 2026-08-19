@@ -22,7 +22,7 @@ export default async function PaginaZhensi() {
         },
       }),
       db.apunte.count({ where: { zhensi_id: sesion.user.id } }),
-      db.solicitud.count({ where: { estado: "abierta" } }),
+      db.solicitud.count({ where: { estado: "abierta", archivada: false } }),
       db.perfil_zhensi.findUnique({
         where: { usuario_id: sesion.user.id },
         select: { visible_publico: true },
@@ -76,13 +76,13 @@ export default async function PaginaZhensi() {
     },
     {
       titulo: "Solicitudes abiertas",
-      href: "/solicitudes",
+      href: "/zhensi/solicitudes",
       resumen:
         abiertas === 0
           ? "Ahora mismo no hay solicitudes abiertas."
           : abiertas === 1
-            ? "1 solicitud esperando."
-            : `${abiertas} solicitudes esperando.`,
+            ? "1 solicitud esperando. Puedes proponerte para darla."
+            : `${abiertas} solicitudes esperando. Puedes proponerte para darlas.`,
       pendiente: false,
     },
   ];

@@ -57,6 +57,7 @@ model usuario {
   apuntes              apunte[]         @relation("apunte_zhensi")
   mensajes_atendidos   mensaje_buzon[]  @relation("buzon_atendido_por")
   ajustes_horas        ajuste_horas[]   @relation("ajuste_zhensi")
+  propuestas           propuesta_zhensi[] @relation("propuesta_zhensi")
   ajustes_creados      ajuste_horas[]   @relation("ajuste_creador")
 
   @@map("usuario")
@@ -170,6 +171,7 @@ model solicitud {
   sesion           sesion?           @relation("solicitud_agendada", fields: [sesion_id], references: [id])
   apoyos_registros apoyo_solicitud[]
   reportes         reporte_error_solicitud[]
+  propuestas       propuesta_zhensi[]
 
   @@map("solicitud")
 }
@@ -196,6 +198,20 @@ model reporte_error_solicitud {
 
   @@unique([solicitud_id, huella])
   @@map("reporte_error_solicitud")
+}
+
+model propuesta_zhensi {
+  id           String   @id @default(uuid())
+  solicitud_id String
+  zhensi_id    String
+  mensaje      String?
+  creada_en    DateTime @default(now())
+
+  solicitud solicitud @relation(fields: [solicitud_id], references: [id], onDelete: Cascade)
+  zhensi    usuario   @relation("propuesta_zhensi", fields: [zhensi_id], references: [id], onDelete: Cascade)
+
+  @@unique([solicitud_id, zhensi_id])
+  @@map("propuesta_zhensi")
 }
 
 model sesion {
