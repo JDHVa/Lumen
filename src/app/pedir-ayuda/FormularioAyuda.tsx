@@ -35,6 +35,7 @@ export function FormularioAyuda({
   const [materiaId, setMateriaId] = useState("");
   const [tituloTema, setTituloTema] = useState("");
   const [descripcion, setDescripcion] = useState("");
+  const [cuantas, setCuantas] = useState("");
   const [seleccion, setSeleccion] = useState(() => new Set<string>());
   const alternadores = usarAlternadores(setSeleccion);
 
@@ -215,6 +216,20 @@ export function FormularioAyuda({
             }
             ayuda="Entre más claro seas, más fácil es que alguien le entre."
           />
+
+          <Selector
+            etiqueta="¿Con cuántas sesiones crees que te alcanza?"
+            name="sesiones_deseadas"
+            value={cuantas}
+            onChange={(evento) => setCuantas(evento.target.value)}
+            ayuda="Es un cálculo tuyo, no un compromiso. Sirve para saber si te agendamos un solo día o varios seguidos."
+          >
+            <option value="">No sé todavía</option>
+            <option value="1">Con una sesión me alcanza</option>
+            <option value="2">Como dos sesiones</option>
+            <option value="3">Como tres sesiones</option>
+            <option value="4">Cuatro o más, es un tema largo</option>
+          </Selector>
         </Tarjeta>
       </Seccion>
 

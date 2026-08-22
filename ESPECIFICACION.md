@@ -104,7 +104,13 @@ hasta que la cambie.
 (nulo si es tema especial), `titulo_tema` (requerido si es tema especial),
 `descripcion`, `carrera_id` (contexto, opcional), `franjas_preferidas`,
 `apoyos` (contador), `estado` (`abierta` | `agendada` | `cerrada` | `oculta`),
-`sesion_id` (nulo hasta agendarse), `creada_en`
+`sesiones_deseadas` (opcional), `creada_en`
+
+`sesiones_deseadas` es el cálculo del propio schüler de con cuántas sesiones
+cree que le alcanza, de 1 a 4 o más. Puede dejarlo en blanco. No es un
+compromiso ni obliga a nada: es una pista para que el admin sepa si agenda un
+solo día o varios. La liga con las sesiones vive en `sesion.solicitud_id`, así
+que una misma solicitud puede terminar en varias sesiones.
 
 Dos tipos de solicitud conviven en el mismo tablero:
 
@@ -121,6 +127,22 @@ después en el tablero.
 `franjas_preferidas` guarda en qué días y rangos de hora le queda bien al
 solicitante. Es la entrada del cruce automático del panel de asignación.
 
+### pregunta_solicitud
+`id`, `solicitud_id`, `zhensi_id`, `texto` (máx. 300 caracteres), `creada_en`
+
+Un zhensi puede preguntarle algo a una solicitud abierta desde su panel, por
+ejemplo qué temas en específico se quieren ver. La pregunta se publica en el
+tablero público con el nombre del zhensi. Máximo tres preguntas por zhensi por
+solicitud, y la puede borrar mientras nadie la haya contestado.
+
+### respuesta_pregunta
+`id`, `pregunta_id`, `texto` (máx. 500 caracteres), `huella`, `creada_en`
+
+Cualquiera puede contestar desde el tablero, **sin cuenta y sin dar su
+nombre**. La respuesta se publica ahí mismo, anónima. La `huella` es la misma
+marca anónima del navegador que usan los apoyos: solo sirve para que el mismo
+navegador no conteste dos veces la misma pregunta. No identifica a nadie.
+
 ### apoyo_solicitud
 `id`, `solicitud_id`, `huella`, `creado_en`
 
@@ -128,7 +150,8 @@ Registra cada "yo también lo necesito". `huella` es un identificador anónimo
 del navegador para evitar votos repetidos. No identifica a la persona.
 
 ### sesion
-`id`, `solicitud_id` (nulo si el admin la crea por su cuenta), `zhensi_id`,
+`id`, `solicitud_id` (nulo si el admin la crea por su cuenta; varias sesiones
+pueden apuntar a la misma solicitud), `zhensi_id`,
 `materia_id` (nulo en temas especiales), `titulo`, `fecha`, `hora_inicio`,
 `hora_fin`, `salon`, `estado` (`borrador` | `publicada` | `realizada` |
 `cancelada`), `creada_por`, `notas_publicas`
@@ -161,8 +184,10 @@ Repositorio de apuntes de generaciones pasadas.
 3. Un admin abre el panel de demanda, ordenado por número de apoyos. Al abrir
    una solicitud, el sistema le muestra **solo los zhensis que pueden dar esa
    materia y cuya disponibilidad empata con las franjas pedidas.**
-4. El admin elige zhensi, salón y hora, y publica. La solicitud pasa a
-   `agendada` y queda ligada a la sesión.
+4. El admin elige zhensi, salón y hora, y publica. Puede agendar una sola
+   sesión o varias de un jalón, incluyendo el mismo horario repetido varias
+   semanas seguidas. La solicitud pasa a `agendada` y queda ligada a todas
+   esas sesiones. Vuelve a `abierta` solo si se cancelan todas.
 5. La sesión aparece en el tablero público. El schüler regresa, ve que su
    solicitud ya tiene fecha y salón, y asiste si quiere.
 6. Después de la sesión, un admin captura cuánta gente llegó.
@@ -183,7 +208,10 @@ grande; una con 2 es tutoría chica. Esa es toda la lógica.
   especial". Al enviar, muestra el código público de la solicitud.
 - **Tablero de demanda**: solicitudes abiertas ordenadas por apoyos, con
   filtro por carrera y buscador por código. Cada tarjeta trae el botón "yo
-  también lo necesito". Las agendadas muestran su fecha y salón.
+  también lo necesito", las preguntas que hicieron los zhensis con su caja
+  para contestarlas de forma anónima, y el aviso de "¿te equivocaste?", que
+  nunca promete que la solicitud se borre, solo que alguien la va a revisar.
+  Las agendadas muestran su fecha y salón.
 - **Zhensis**: galería con foto, carrera, materias y la línea de "así explico
   yo".
 - **Apuntes**: repositorio filtrable por carrera y materia.
@@ -191,6 +219,8 @@ grande; una con 2 es tutoría chica. Esa es toda la lógica.
 
 ### Zona zhensi
 
+- **Solicitudes abiertas**: lo que está pidiendo la gente. Puede proponerse
+  para darla y puede preguntarle algo a la solicitud.
 - **Mi disponibilidad**: cuadrícula semanal, un toque por bloque.
 - **Mis sesiones**: las asignadas, más el contador de horas acumuladas.
 - **Mi perfil**: foto, materias que puede dar, descripción corta.

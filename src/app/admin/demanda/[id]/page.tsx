@@ -8,6 +8,7 @@ import { Seccion } from "@/components/ui/Seccion";
 import { cruzar, limpiarFranjas } from "@/lib/cruce";
 import { leerClaveBloque, nombreDia, etiquetaDeBloque } from "@/lib/horarios";
 import { proximaFechaCon, comoTexto, fechaLegible } from "@/lib/fechas";
+import { textoSesionesDeseadas } from "@/lib/solicitudes";
 import { FormularioAgendar, type CandidatoVista } from "./FormularioAgendar";
 
 export const dynamic = "force-dynamic";
@@ -31,6 +32,7 @@ export default async function PaginaAgendar({
       estado: true,
       materia_id: true,
       franjas_preferidas: true,
+      sesiones_deseadas: true,
       materia: { select: { nombre: true } },
       carrera: { select: { clave: true, nombre: true } },
       propuestas: {
@@ -40,6 +42,18 @@ export default async function PaginaAgendar({
           mensaje: true,
           creada_en: true,
           zhensi: { select: { id: true, nombre: true, activo: true } },
+        },
+      },
+      preguntas: {
+        orderBy: { creada_en: "asc" },
+        select: {
+          id: true,
+          texto: true,
+          zhensi: { select: { nombre: true } },
+          respuestas: {
+            orderBy: { creada_en: "asc" },
+            select: { id: true, texto: true },
+          },
         },
       },
     },
@@ -150,12 +164,52 @@ export default async function PaginaAgendar({
         <span className="text-sm text-tinta-suave">
           {franjasLegibles.join(" · ")}
         </span>
+        <span className="pt-2 text-sm text-tinta-suave">
+          {textoSesionesDeseadas(solicitud.sesiones_deseadas)}.
+        </span>
         {solicitud.carrera ? (
           <span className="pt-2 text-sm text-tinta-suave">
             Carrera: {solicitud.carrera.nombre}
           </span>
         ) : null}
       </Tarjeta>
+
+      {solicitud.preguntas.length > 0 ? (
+        <Seccion
+          titulo="Preguntas y respuestas"
+          descripcion="Lo que preguntó un zhenshi en el tablero y lo que contestaron de forma anónima."
+        >
+          <ul className="flex flex-col gap-2.5">
+            {solicitud.preguntas.map((pregunta) => (
+              <li key={pregunta.id}>
+                <Tarjeta className="flex flex-col gap-2 py-4">
+                  <p className="leading-relaxed break-words text-marino">
+                    <span className="font-medium">
+                      {pregunta.zhensi.nombre}:
+                    </span>{" "}
+                    {pregunta.texto}
+                  </p>
+
+                  {pregunta.respuestas.length === 0 ? (
+                    <span className="text-sm text-tinta-suave">
+                      Todavía nadie la contesta.
+                    </span>
+                  ) : (
+                    pregunta.respuestas.map((respuesta) => (
+                      <p
+                        key={respuesta.id}
+                        className="border-l-2 border-dorado pl-3 text-sm leading-relaxed break-words text-tinta-suave"
+                      >
+                        {respuesta.texto}
+                      </p>
+                    ))
+                  )}
+                </Tarjeta>
+              </li>
+            ))}
+          </ul>
+        </Seccion>
+      ) : null}
 
       {solicitud.propuestas.length > 0 ? (
         <Seccion
@@ -255,6 +309,7 @@ export default async function PaginaAgendar({
               solicitudId={solicitud.id}
               tituloSugerido={nombreCosa}
               candidatos={paraFormulario}
+              sesionesDeseadas={solicitud.sesiones_deseadas}
             />
           </Seccion>
         </>

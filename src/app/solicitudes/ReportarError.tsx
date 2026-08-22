@@ -25,7 +25,8 @@ export function ReportarError({
   if (yaReportada && !estado.exito && !estado.error) {
     return (
       <p className="text-sm text-tinta-suave">
-        Ya avisaste que esta se mandó por error. Alguien la va a revisar.
+        Ya avisaste que esta se mandó por error. Alguien de Lumen la va a
+        revisar.
       </p>
     );
   }
@@ -45,8 +46,8 @@ export function ReportarError({
       <input type="hidden" name="solicitud_id" value={solicitudId} />
 
       <p className="text-sm leading-relaxed text-tinta-suave">
-        Si mandaste esta solicitud por error, avísanos y alguien la va a quitar.
-        No la borres tú, no hace falta.
+        Si mandaste esta solicitud por error, avísanos y alguien de Lumen la va
+        a revisar. Tú no tienes que hacer nada más.
       </p>
 
       {estado.error ? <Aviso tono="error">{estado.error}</Aviso> : null}

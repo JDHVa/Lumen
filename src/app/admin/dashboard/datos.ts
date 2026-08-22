@@ -45,7 +45,11 @@ export async function cargarMetricas() {
         apoyos: true,
         creada_en: true,
         materia: { select: { nombre: true } },
-        sesion: { select: { creada_en: true } },
+        sesiones: {
+          orderBy: { creada_en: "asc" },
+          take: 1,
+          select: { creada_en: true },
+        },
       },
     }),
     db.usuario.count({ where: { es_zhensi: true, activo: true } }),
@@ -146,10 +150,10 @@ export async function cargarMetricas() {
 
   const espera = diasDeEspera(
     solicitudes
-      .filter((una) => una.sesion !== null)
+      .filter((una) => una.sesiones.length > 0)
       .map((una) => ({
         creada_en: una.creada_en,
-        agendada_en: una.sesion!.creada_en,
+        agendada_en: una.sesiones[0].creada_en,
       })),
   );
 

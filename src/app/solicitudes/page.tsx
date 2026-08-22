@@ -8,7 +8,9 @@ import { Etiqueta } from "@/components/ui/Etiqueta";
 import { normalizarCodigo } from "@/lib/codigo";
 import { leerHuella } from "@/lib/huella";
 import { leerClaveBloque, nombreDia, etiquetaDeBloque } from "@/lib/horarios";
+import { textoSesionesDeseadas } from "@/lib/solicitudes";
 import { Filtros } from "./Filtros";
+import { Preguntas, type PreguntaVista } from "./Preguntas";
 import { apoyar } from "./acciones";
 import { ReportarError } from "./ReportarError";
 
@@ -73,9 +75,22 @@ export default async function PaginaSolicitudes({
         apoyos: true,
         estado: true,
         franjas_preferidas: true,
+        sesiones_deseadas: true,
         creada_en: true,
         materia: { select: { nombre: true } },
         carrera: { select: { clave: true } },
+        preguntas: {
+          orderBy: { creada_en: "asc" },
+          select: {
+            id: true,
+            texto: true,
+            zhensi: { select: { nombre: true } },
+            respuestas: {
+              orderBy: { creada_en: "asc" },
+              select: { id: true, texto: true, huella: true },
+            },
+          },
+        },
       },
     }),
     leerHuella(),
@@ -111,6 +126,22 @@ export default async function PaginaSolicitudes({
 
   const yaApoyadas = new Set(mios.map((fila) => fila.solicitud_id));
   const yaReportadas = new Set(reportadas.map((fila) => fila.solicitud_id));
+
+  const armarPreguntas = (
+    crudas: (typeof solicitudes)[number]["preguntas"],
+  ): PreguntaVista[] =>
+    crudas.map((pregunta) => ({
+      id: pregunta.id,
+      texto: pregunta.texto,
+      zhensi: pregunta.zhensi.nombre,
+      respuestas: pregunta.respuestas.map((respuesta) => ({
+        id: respuesta.id,
+        texto: respuesta.texto,
+      })),
+      yaRespondi: huella
+        ? pregunta.respuestas.some((respuesta) => respuesta.huella === huella)
+        : false,
+    }));
 
   const hayBusqueda = Boolean(parametros.codigo || carreraFiltro);
 
@@ -201,6 +232,17 @@ export default async function PaginaSolicitudes({
                           ))}
                         </div>
                       ) : null}
+
+                      {solicitud.sesiones_deseadas !== null ? (
+                        <span className="text-sm text-tinta-suave">
+                          {textoSesionesDeseadas(solicitud.sesiones_deseadas)}.
+                        </span>
+                      ) : null}
+
+                      <Preguntas
+                        preguntas={armarPreguntas(solicitud.preguntas)}
+                        sePuedeContestar={solicitud.estado === "abierta"}
+                      />
 
                       {solicitud.estado === "abierta" ? (
                         apoyada ? (
