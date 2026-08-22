@@ -4,13 +4,15 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { leerClaveBloque } from "@/lib/horarios";
-import { aFecha, diaSemanaDe, fechaLegible } from "@/lib/fechas";
+import { leerClaveBloque, nombreDia } from "@/lib/horarios";
+import { aFecha, comoTexto, diaSemanaDe, fechaLegible } from "@/lib/fechas";
 
 export type EstadoAgenda = {
   error?: string;
   advertencia?: string;
 };
+
+const TOPE_DIAS = 8;
 
 export async function agendar(
   _estado: EstadoAgenda,
@@ -23,8 +25,6 @@ export async function agendar(
 
   const solicitud_id = String(datos.get("solicitud_id") ?? "");
   const zhensi_id = String(datos.get("zhensi_id") ?? "");
-  const clave = String(datos.get("bloque") ?? "");
-  const fechaCruda = String(datos.get("fecha") ?? "");
   const salon = String(datos.get("salon") ?? "").trim();
   const titulo = String(datos.get("titulo") ?? "").trim();
   const notas = String(datos.get("notas_publicas") ?? "").trim();
@@ -37,16 +37,46 @@ export async function agendar(
   if (!titulo) return { error: "Ponle un título a la sesión." };
   if (!salon) return { error: "Falta el salón." };
 
-  const bloque = leerClaveBloque(clave);
-  if (!bloque) return { error: "Ese horario ya no es válido. Elige otro." };
+  const claves = datos.getAll("bloque").map((valor) => String(valor));
+  const fechasCrudas = datos.getAll("fecha").map((valor) => String(valor));
 
-  const fecha = aFecha(fechaCruda);
-  if (!fecha) return { error: "La fecha no es válida." };
+  if (claves.length === 0) {
+    return { error: "Marca al menos un día." };
+  }
 
-  if (diaSemanaDe(fecha) !== bloque.dia) {
+  if (claves.length !== fechasCrudas.length) {
+    return { error: "Falta ponerle fecha a alguno de los días." };
+  }
+
+  if (claves.length > TOPE_DIAS) {
     return {
-      error: `El horario que elegiste es de ${["", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"][bloque.dia]}, pero la fecha que pusiste cae en ${fechaLegible(fecha).toLowerCase()}.`,
+      error: `Son demasiados días de una sola vez. El tope son ${TOPE_DIAS}.`,
     };
+  }
+
+  const dias: { inicio: string; fin: string; fecha: Date }[] = [];
+
+  for (let indice = 0; indice < claves.length; indice += 1) {
+    const bloque = leerClaveBloque(claves[indice]);
+    if (!bloque) return { error: "Uno de los horarios ya no es válido." };
+
+    const fecha = aFecha(fechasCrudas[indice]);
+    if (!fecha) return { error: "Una de las fechas no es válida." };
+
+    if (diaSemanaDe(fecha) !== bloque.dia) {
+      return {
+        error: `El horario de ${nombreDia(bloque.dia).toLowerCase()} no cuadra con la fecha ${fechaLegible(fecha)} que le pusiste.`,
+      };
+    }
+
+    dias.push({ inicio: bloque.inicio, fin: bloque.fin, fecha });
+  }
+
+  const repetidos = new Set(
+    dias.map((dia) => `${comoTexto(dia.fecha)}|${dia.inicio}`),
+  );
+  if (repetidos.size !== dias.length) {
+    return { error: "Hay dos días con la misma fecha y la misma hora." };
   }
 
   const solicitud = await db.solicitud.findUnique({
@@ -65,43 +95,54 @@ export async function agendar(
   }
 
   if (!confirmado) {
-    const traslape = await db.sesion.findFirst({
-      where: {
-        zhensi_id,
-        fecha,
-        estado: { in: ["borrador", "publicada", "realizada"] },
-        hora_inicio: { lt: bloque.fin },
-        hora_fin: { gt: bloque.inicio },
-      },
-      select: { titulo: true, hora_inicio: true, hora_fin: true },
-    });
+    const choques: string[] = [];
 
-    if (traslape) {
+    for (const dia of dias) {
+      const traslape = await db.sesion.findFirst({
+        where: {
+          zhensi_id,
+          fecha: dia.fecha,
+          estado: { in: ["borrador", "publicada", "realizada"] },
+          hora_inicio: { lt: dia.fin },
+          hora_fin: { gt: dia.inicio },
+        },
+        select: { titulo: true, hora_inicio: true, hora_fin: true },
+      });
+
+      if (traslape) {
+        choques.push(
+          `el ${fechaLegible(dia.fecha)} ya tiene "${traslape.titulo}" de ${traslape.hora_inicio} a ${traslape.hora_fin}`,
+        );
+      }
+    }
+
+    if (choques.length > 0) {
       return {
-        advertencia: `${zhensi.nombre} ya tiene "${traslape.titulo}" ese día de ${traslape.hora_inicio} a ${traslape.hora_fin}. Se encima con lo que estás agendando.`,
+        advertencia: `A ${zhensi.nombre} se le encima: ${choques.join("; ")}.`,
       };
     }
   }
 
   await db.$transaction(async (tx) => {
-    const creada = await tx.sesion.create({
-      data: {
+    await tx.sesion.createMany({
+      data: dias.map((dia) => ({
+        solicitud_id,
         zhensi_id,
         materia_id: solicitud.materia_id,
         titulo,
-        fecha,
-        hora_inicio: bloque.inicio,
-        hora_fin: bloque.fin,
+        fecha: dia.fecha,
+        hora_inicio: dia.inicio,
+        hora_fin: dia.fin,
         salon,
-        estado: "publicada",
+        estado: "publicada" as const,
         creada_por: sesion.user.id,
         notas_publicas: notas || null,
-      },
+      })),
     });
 
     await tx.solicitud.update({
       where: { id: solicitud_id },
-      data: { estado: "agendada", sesion_id: creada.id },
+      data: { estado: "agendada" },
     });
   });
 

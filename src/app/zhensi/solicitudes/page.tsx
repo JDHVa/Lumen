@@ -9,7 +9,9 @@ import {
   etiquetaDeBloque,
   claveBloque,
 } from "@/lib/horarios";
+import { textoSesionesDeseadas } from "@/lib/solicitudes";
 import { Proponerse } from "./Proponerse";
+import { Preguntas, type PreguntaMia } from "./Preguntar";
 
 export const dynamic = "force-dynamic";
 
@@ -22,8 +24,10 @@ type SolicitudZhensi = {
   apoyos: number;
   materia_id: string | null;
   franjas_preferidas: unknown;
+  sesiones_deseadas: number | null;
   materia: { nombre: string } | null;
   carrera: { clave: string } | null;
+  preguntas: PreguntaMia[];
 };
 
 function resumirFranjas(crudas: unknown) {
@@ -101,6 +105,15 @@ function Fila({
         </div>
       ) : null}
 
+      <span className="text-sm text-tinta-suave">
+        {textoSesionesDeseadas(solicitud.sesiones_deseadas)}.
+      </span>
+
+      <Preguntas
+        solicitudId={solicitud.id}
+        preguntas={solicitud.preguntas}
+      />
+
       <div className="pt-1">
         <Proponerse solicitudId={solicitud.id} yaPropuesto={propuesta} />
       </div>
@@ -127,8 +140,22 @@ export default async function PaginaSolicitudesZhensi() {
           apoyos: true,
           materia_id: true,
           franjas_preferidas: true,
+          sesiones_deseadas: true,
           materia: { select: { nombre: true } },
           carrera: { select: { clave: true } },
+          preguntas: {
+            orderBy: { creada_en: "asc" },
+            select: {
+              id: true,
+              texto: true,
+              zhensi_id: true,
+              zhensi: { select: { nombre: true } },
+              respuestas: {
+                orderBy: { creada_en: "asc" },
+                select: { id: true, texto: true },
+              },
+            },
+          },
         },
       }),
       db.zhensi_materia.findMany({
@@ -162,7 +189,16 @@ export default async function PaginaSolicitudesZhensi() {
     return crudas.some((valor) => misBloques.has(String(valor)));
   };
 
-  const lista = solicitudes as SolicitudZhensi[];
+  const lista: SolicitudZhensi[] = solicitudes.map((solicitud) => ({
+    ...solicitud,
+    preguntas: solicitud.preguntas.map((pregunta) => ({
+      id: pregunta.id,
+      texto: pregunta.texto,
+      zhensi: pregunta.zhensi.nombre,
+      esMia: pregunta.zhensi_id === sesion.user.id,
+      respuestas: pregunta.respuestas,
+    })),
+  }));
   const mias = lista.filter(esMia);
   const otras = lista.filter((solicitud) => !esMia(solicitud));
 

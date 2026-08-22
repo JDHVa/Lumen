@@ -28,20 +28,24 @@ export async function cambiarEstadoSesion(datos: FormData) {
 
   const encontrada = await db.sesion.findUnique({
     where: { id },
-    select: { id: true, solicitud: { select: { id: true } } },
+    select: { id: true, solicitud_id: true },
   });
   if (!encontrada) return;
 
   await db.$transaction(async (tx) => {
     await tx.sesion.update({ where: { id }, data: { estado: destino } });
 
-    if (encontrada.solicitud) {
-      await tx.solicitud.update({
-        where: { id: encontrada.solicitud.id },
-        data: {
-          estado: destino === "cancelada" ? "abierta" : "agendada",
-          sesion_id: destino === "cancelada" ? null : id,
+    if (encontrada.solicitud_id) {
+      const vivas = await tx.sesion.count({
+        where: {
+          solicitud_id: encontrada.solicitud_id,
+          estado: { not: "cancelada" },
         },
+      });
+
+      await tx.solicitud.update({
+        where: { id: encontrada.solicitud_id },
+        data: { estado: vivas === 0 ? "abierta" : "agendada" },
       });
     }
   });

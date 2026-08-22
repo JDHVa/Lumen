@@ -72,6 +72,16 @@ export async function crearSolicitud(
     }
   }
 
+  const deseadasCrudo = String(datos.get("sesiones_deseadas") ?? "");
+  let sesiones_deseadas: number | null = null;
+  if (deseadasCrudo !== "") {
+    const numero = Number(deseadasCrudo);
+    if (!Number.isInteger(numero) || numero < 1 || numero > 4) {
+      return { error: "Dinos cuántas sesiones crees que necesitas." };
+    }
+    sesiones_deseadas = numero;
+  }
+
   const franjas = datos
     .getAll("bloque")
     .map((valor) => String(valor))
@@ -101,6 +111,7 @@ export async function crearSolicitud(
         descripcion,
         carrera_id,
         franjas_preferidas: franjas,
+        sesiones_deseadas,
       },
     });
   }

@@ -58,6 +58,7 @@ model usuario {
   mensajes_atendidos   mensaje_buzon[]  @relation("buzon_atendido_por")
   ajustes_horas        ajuste_horas[]   @relation("ajuste_zhensi")
   propuestas           propuesta_zhensi[] @relation("propuesta_zhensi")
+  preguntas            pregunta_solicitud[] @relation("pregunta_zhensi")
   ajustes_creados      ajuste_horas[]   @relation("ajuste_creador")
 
   @@map("usuario")
@@ -159,7 +160,7 @@ model solicitud {
   franjas_preferidas Json
   apoyos             Int              @default(0)
   estado             estado_solicitud @default(abierta)
-  sesion_id          String?          @unique
+  sesiones_deseadas  Int?
   reportes_error     Int              @default(0)
   reportada_en       DateTime?
   archivada          Boolean          @default(false)
@@ -168,10 +169,11 @@ model solicitud {
 
   materia          materia?          @relation(fields: [materia_id], references: [id])
   carrera          carrera?          @relation(fields: [carrera_id], references: [id])
-  sesion           sesion?           @relation("solicitud_agendada", fields: [sesion_id], references: [id])
+  sesiones         sesion[]          @relation("solicitud_agendada")
   apoyos_registros apoyo_solicitud[]
   reportes         reporte_error_solicitud[]
   propuestas       propuesta_zhensi[]
+  preguntas        pregunta_solicitud[]
 
   @@map("solicitud")
 }
@@ -214,8 +216,37 @@ model propuesta_zhensi {
   @@map("propuesta_zhensi")
 }
 
+model pregunta_solicitud {
+  id           String   @id @default(uuid())
+  solicitud_id String
+  zhensi_id    String
+  texto        String   @db.VarChar(300)
+  creada_en    DateTime @default(now())
+
+  solicitud  solicitud            @relation(fields: [solicitud_id], references: [id], onDelete: Cascade)
+  zhensi     usuario              @relation("pregunta_zhensi", fields: [zhensi_id], references: [id], onDelete: Cascade)
+  respuestas respuesta_pregunta[]
+
+  @@index([solicitud_id])
+  @@map("pregunta_solicitud")
+}
+
+model respuesta_pregunta {
+  id          String   @id @default(uuid())
+  pregunta_id String
+  texto       String   @db.VarChar(500)
+  huella      String
+  creada_en   DateTime @default(now())
+
+  pregunta pregunta_solicitud @relation(fields: [pregunta_id], references: [id], onDelete: Cascade)
+
+  @@unique([pregunta_id, huella])
+  @@map("respuesta_pregunta")
+}
+
 model sesion {
   id             String        @id @default(uuid())
+  solicitud_id   String?
   zhensi_id      String
   materia_id     String?
   titulo         String
@@ -231,8 +262,10 @@ model sesion {
   zhensi     usuario     @relation("sesion_zhensi", fields: [zhensi_id], references: [id])
   creador    usuario     @relation("sesion_creador", fields: [creada_por], references: [id])
   materia    materia?    @relation(fields: [materia_id], references: [id])
-  solicitud  solicitud?  @relation("solicitud_agendada")
+  solicitud  solicitud?  @relation("solicitud_agendada", fields: [solicitud_id], references: [id])
   asistencia asistencia?
+
+  @@index([solicitud_id])
 
   @@map("sesion")
 }

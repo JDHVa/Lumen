@@ -3,6 +3,7 @@ import { BotonEnlace } from "@/components/ui/Boton";
 import { Tarjeta } from "@/components/ui/Tarjeta";
 import { Etiqueta } from "@/components/ui/Etiqueta";
 import { Seccion } from "@/components/ui/Seccion";
+import { etiquetaSesionesDeseadas } from "@/lib/solicitudes";
 
 export const dynamic = "force-dynamic";
 
@@ -13,9 +14,10 @@ type SolicitudDemanda = {
   titulo_tema: string | null;
   descripcion: string;
   apoyos: number;
+  sesiones_deseadas: number | null;
   materia: { nombre: string } | null;
   carrera: { clave: string } | null;
-  _count: { propuestas: number };
+  _count: { propuestas: number; preguntas: number };
   propuestas: { zhensi: { nombre: string } }[];
 };
 
@@ -37,6 +39,16 @@ function FilaDemanda({ solicitud }: { solicitud: SolicitudDemanda }) {
         ) : null}
         {solicitud.carrera ? (
           <Etiqueta tono="marino">{solicitud.carrera.clave}</Etiqueta>
+        ) : null}
+        <Etiqueta tono="apagado">
+          {etiquetaSesionesDeseadas(solicitud.sesiones_deseadas)}
+        </Etiqueta>
+        {solicitud._count.preguntas > 0 ? (
+          <Etiqueta tono="apagado">
+            {solicitud._count.preguntas === 1
+              ? "1 pregunta"
+              : `${solicitud._count.preguntas} preguntas`}
+          </Etiqueta>
         ) : null}
         <span className="ml-auto text-sm font-semibold text-marino">
           {solicitud.apoyos === 1 ? "1 apoyo" : `${solicitud.apoyos} apoyos`}
@@ -84,9 +96,10 @@ export default async function PaginaDemanda() {
       titulo_tema: true,
       descripcion: true,
       apoyos: true,
+      sesiones_deseadas: true,
       materia: { select: { nombre: true } },
       carrera: { select: { clave: true } },
-      _count: { select: { propuestas: true } },
+      _count: { select: { propuestas: true, preguntas: true } },
       propuestas: {
         orderBy: { creada_en: "asc" },
         select: { zhensi: { select: { nombre: true } } },
