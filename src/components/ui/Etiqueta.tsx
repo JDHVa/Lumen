@@ -18,7 +18,7 @@ export function Etiqueta({
 }) {
   return (
     <span
-      className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold tracking-wide ${tonos[tono]}`}
+      className={`inline-flex max-w-full items-center break-words rounded-full px-2.5 py-1 text-xs font-semibold tracking-wide ${tonos[tono]}`}
     >
       {children}
     </span>

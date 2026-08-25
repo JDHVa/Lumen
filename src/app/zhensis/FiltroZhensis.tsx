@@ -101,7 +101,7 @@ export function FiltroZhensis({
                     <Iniciales nombre={zhenshi.nombre} grande />
                   )}
                   <div className="flex min-w-0 flex-col gap-0.5">
-                    <span className="font-titulos text-xl font-semibold text-marino">
+                    <span className="font-titulos text-xl font-semibold break-words text-marino">
                       {zhenshi.nombre}
                     </span>
                     <span className="text-sm text-tinta-suave">

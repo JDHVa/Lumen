@@ -8,11 +8,11 @@ export function Campo({
   ...resto
 }: ComponentProps<"input"> & { etiqueta: string; ayuda?: ReactNode }) {
   return (
-    <label className="flex flex-col gap-1.5">
+    <label className="flex w-full min-w-0 flex-col gap-1.5">
       <span className="text-sm font-semibold text-marino">{etiqueta}</span>
       <input
         className={[
-          "min-h-[48px] rounded-suave border border-marino/20 bg-white px-4 py-3 text-base text-tinta transition-colors duration-150",
+          "w-full min-w-0 min-h-[48px] rounded-suave border border-marino/20 bg-white px-4 py-3 text-base text-tinta transition-colors duration-150",
           "placeholder:text-tinta-suave/70 hover:border-marino/35 focus:border-marino focus:outline-none focus:ring-2 focus:ring-marino/15",
           className,
         ]
