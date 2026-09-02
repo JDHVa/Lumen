@@ -111,6 +111,90 @@ export async function capturarAsistencia(
   };
 }
 
+export async function editarSesion(
+  _estado: EstadoSesion,
+  datos: FormData,
+): Promise<EstadoSesion> {
+  const sesion = await auth();
+  if (!sesion?.user.es_admin) {
+    return { error: "No tienes permiso para hacer esto." };
+  }
+
+  const id = String(datos.get("id") ?? "");
+  const zhensi_id = String(datos.get("zhensi_id") ?? "");
+  const titulo = String(datos.get("titulo") ?? "").trim();
+  const salon = String(datos.get("salon") ?? "").trim();
+  const clave = String(datos.get("bloque") ?? "");
+  const fechaCruda = String(datos.get("fecha") ?? "");
+  const notas = String(datos.get("notas_publicas") ?? "").trim();
+
+  if (!id) return { error: "Falta la sesión." };
+  if (!zhensi_id) return { error: "Elige quién la da." };
+  if (!titulo) return { error: "Ponle un título a la sesión." };
+  if (!salon) return { error: "Falta el salón." };
+
+  const bloque = leerClaveBloque(clave);
+  if (!bloque) return { error: "Ese horario no es válido." };
+
+  const fecha = aFecha(fechaCruda);
+  if (!fecha) return { error: "La fecha no es válida." };
+
+  if (diaSemanaDe(fecha) !== bloque.dia) {
+    return {
+      error: "La fecha que pusiste no cae en el día del horario que elegiste.",
+    };
+  }
+
+  const encontrada = await db.sesion.findUnique({
+    where: { id },
+    select: { id: true, estado: true },
+  });
+  if (!encontrada) return { error: "Esa sesión ya no existe." };
+  if (encontrada.estado === "realizada") {
+    return { error: "No se puede editar una sesión que ya se realizó." };
+  }
+
+  const zhensi = await db.usuario.findUnique({ where: { id: zhensi_id } });
+  if (!zhensi || !zhensi.es_zhensi || !zhensi.activo) {
+    return { error: "Esa cuenta no puede dar sesiones." };
+  }
+
+  const traslape = await db.sesion.findFirst({
+    where: {
+      id: { not: id },
+      zhensi_id,
+      fecha,
+      estado: { in: ["borrador", "publicada", "realizada"] },
+      hora_inicio: { lt: bloque.fin },
+      hora_fin: { gt: bloque.inicio },
+    },
+    select: { titulo: true, hora_inicio: true, hora_fin: true },
+  });
+
+  if (traslape) {
+    return {
+      error: `A ${zhensi.nombre} se le encima con "${traslape.titulo}" de ${traslape.hora_inicio} a ${traslape.hora_fin}.`,
+    };
+  }
+
+  await db.sesion.update({
+    where: { id },
+    data: {
+      zhensi_id,
+      titulo,
+      fecha,
+      hora_inicio: bloque.inicio,
+      hora_fin: bloque.fin,
+      salon,
+      notas_publicas: notas || null,
+    },
+  });
+
+  refrescar();
+
+  return { exito: "Sesión actualizada." };
+}
+
 export async function crearSesionSuelta(
   _estado: EstadoSesion,
   datos: FormData,

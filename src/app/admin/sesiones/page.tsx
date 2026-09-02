@@ -2,11 +2,12 @@ import { db } from "@/lib/db";
 import { Tarjeta } from "@/components/ui/Tarjeta";
 import { Etiqueta } from "@/components/ui/Etiqueta";
 import { Seccion } from "@/components/ui/Seccion";
-import { etiquetaDeBloque } from "@/lib/horarios";
-import { diaSemanaDe, fechaLegible } from "@/lib/fechas";
+import { etiquetaDeBloque, claveBloque } from "@/lib/horarios";
+import { diaSemanaDe, fechaLegible, comoTexto } from "@/lib/fechas";
 import { cambiarEstadoSesion } from "./acciones";
 import { FormularioSesion } from "./FormularioSesion";
 import { FormularioAsistencia } from "./FormularioAsistencia";
+import { FormularioEditar } from "./FormularioEditar";
 import { BotonAccion } from "@/components/ui/BotonAccion";
 
 export const dynamic = "force-dynamic";
@@ -32,6 +33,7 @@ export default async function PaginaSesiones() {
         salon: true,
         estado: true,
         notas_publicas: true,
+        zhensi_id: true,
         zhensi: { select: { nombre: true } },
         creador: { select: { nombre: true } },
         solicitud: { select: { codigo_publico: true } },
@@ -131,6 +133,24 @@ export default async function PaginaSesiones() {
                     <FormularioAsistencia
                       sesionId={sesion.id}
                       cantidadPrevia={sesion.asistencia?.cantidad ?? null}
+                    />
+                  ) : null}
+
+                  {sesion.estado !== "realizada" ? (
+                    <FormularioEditar
+                      sesion={{
+                        id: sesion.id,
+                        zhensi_id: sesion.zhensi_id,
+                        titulo: sesion.titulo,
+                        fecha: comoTexto(sesion.fecha),
+                        bloque: claveBloque(
+                          diaSemanaDe(sesion.fecha),
+                          sesion.hora_inicio,
+                        ),
+                        salon: sesion.salon,
+                        notas_publicas: sesion.notas_publicas,
+                      }}
+                      zhensis={zhensis}
                     />
                   ) : null}
 
