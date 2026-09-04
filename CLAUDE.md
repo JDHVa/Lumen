@@ -16,13 +16,12 @@ Toda la interfaz, incluidos mensajes de error y textos vacíos, va en español.
 
 1. **Una fase por sesión de trabajo.** Las fases están en la sección 12 de la
    especificación. No empieces la siguiente sin autorización explícita.
-2. **Rama por fase**, con el nombre `fase-N-descripcion`.
-3. **Antes de tocar código, escribe el plan** de la fase y espera aprobación.
+2. **Antes de tocar código, escribe el plan** de la fase y espera aprobación.
    Incluye qué archivos vas a crear o modificar y qué decisiones estás tomando.
-4. **Al terminar, entrega dos cosas**: una explicación del cambio en lenguaje
+3. **Al terminar, entrega dos cosas**: una explicación del cambio en lenguaje
    normal, sin jerga, y una lista numerada de pasos para probarlo a mano en el
    navegador.
-5. Commits pequeños y con mensaje descriptivo en español.
+4. Commits pequeños y con mensaje descriptivo en español.
 
 ## Reglas duras
 
