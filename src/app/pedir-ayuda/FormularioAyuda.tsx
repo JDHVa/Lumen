@@ -14,6 +14,7 @@ import {
 } from "@/components/CuadriculaHorarios";
 import type { CarreraLista, MateriaLista } from "@/app/admin/catalogo/tipos";
 import { ReportarError } from "@/app/solicitudes/ReportarError";
+import { CONTACTO, ligaWhatsapp } from "@/lib/contacto";
 import { crearSolicitud, type EstadoSolicitud } from "./acciones";
 
 const estadoInicial: EstadoSolicitud = {};
@@ -61,6 +62,37 @@ export function FormularioAyuda({
           Apunta ese código o toma una captura. Con él puedes buscar tu
           solicitud en la lista y ver si ya tiene fecha y salón.
         </p>
+        <div className="w-full max-w-md rounded-tarjeta border-2 border-dorado-hondo bg-dorado-tenue p-6 text-left">
+          <span className="block font-titulos text-lg font-bold text-marino">
+            ⚠️ Falta un paso: contáctanos
+          </span>
+          <p className="mt-2 leading-relaxed text-marino">
+            Mándanos un mensaje por WhatsApp o Instagram para confirmarnos que
+            tu solicitud es real. Así la revisamos más rápido y la sacamos
+            adelante. Si no nos escribes, puede que tarde en agendarse.
+          </p>
+          <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+            <a
+              href={ligaWhatsapp(
+                `Hola, acabo de publicar la solicitud ${estado.codigo} en Lumen y quiero confirmar que es real.`,
+              )}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex min-h-[48px] flex-1 items-center justify-center rounded-suave bg-marino px-5 font-semibold text-white transition-colors hover:bg-marino-claro"
+            >
+              Escribir por WhatsApp
+            </a>
+            <a
+              href={CONTACTO.instagram}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex min-h-[48px] flex-1 items-center justify-center rounded-suave border-2 border-marino px-5 font-semibold text-marino transition-colors hover:bg-marino-tenue"
+            >
+              Escribir por Instagram
+            </a>
+          </div>
+        </div>
+
         <div className="flex flex-col gap-3 sm:flex-row">
           <BotonEnlace href={`/solicitudes?codigo=${estado.codigo}`}>
             Ver mi solicitud
