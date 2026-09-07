@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { Analytics } from "@vercel/analytics/next";
 import { fuenteTexto, fuenteTitulos } from "./fuentes";
 import "./globals.css";
 
@@ -24,7 +25,10 @@ export default function RootLayout({
       lang="es"
       className={`${fuenteTitulos.variable} ${fuenteTexto.variable}`}
     >
-      <body className="min-h-screen antialiased">{children}</body>
+      <body className="min-h-screen antialiased">
+        {children}
+        <Analytics />
+      </body>
     </html>
   );
 }
