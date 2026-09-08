@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useMemo, useState } from "react";
+import { useActionState, useMemo, useState, useTransition } from "react";
 import Link from "next/link";
 import { Boton, BotonEnlace } from "@/components/ui/Boton";
 import { Campo } from "@/components/ui/Campo";
@@ -15,7 +15,12 @@ import {
 import type { CarreraLista, MateriaLista } from "@/app/admin/catalogo/tipos";
 import { ReportarError } from "@/app/solicitudes/ReportarError";
 import { CONTACTO, ligaWhatsapp } from "@/lib/contacto";
-import { crearSolicitud, type EstadoSolicitud } from "./acciones";
+import {
+  crearSolicitud,
+  publicarSolicitud,
+  cancelarSolicitud,
+  type EstadoSolicitud,
+} from "./acciones";
 
 const estadoInicial: EstadoSolicitud = {};
 
@@ -39,6 +44,10 @@ export function FormularioAyuda({
   const [cuantas, setCuantas] = useState("");
   const [seleccion, setSeleccion] = useState(() => new Set<string>());
   const alternadores = usarAlternadores(setSeleccion);
+  const [fase, setFase] = useState<"contacto" | "publicada" | "cancelada">(
+    "contacto",
+  );
+  const [procesando, iniciar] = useTransition();
 
   const disponibles = useMemo(
     () =>
@@ -49,35 +58,91 @@ export function FormularioAyuda({
     [materias, carreraId],
   );
 
-  if (estado.codigo) {
+  if (estado.codigo && estado.id) {
+    const solicitudId = estado.id;
+
+    const confirmarContacto = () => {
+      if (procesando) return;
+      iniciar(async () => {
+        await publicarSolicitud(solicitudId);
+        setFase("publicada");
+      });
+    };
+
+    if (fase === "cancelada") {
+      return (
+        <Tarjeta elevada className="flex flex-col items-center gap-5 py-12 text-center">
+          <span className="font-titulos text-2xl font-bold text-marino">
+            Se canceló tu solicitud
+          </span>
+          <p className="max-w-sm leading-relaxed text-tinta-suave">
+            No quedó guardada nada. Si te arrepientes, puedes volver a pedir
+            ayuda cuando quieras.
+          </p>
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <BotonEnlace href="/pedir-ayuda">Pedir ayuda otra vez</BotonEnlace>
+            <BotonEnlace href="/" variante="contorno">
+              Volver al inicio
+            </BotonEnlace>
+          </div>
+        </Tarjeta>
+      );
+    }
+
+    if (fase === "publicada") {
+      return (
+        <Tarjeta elevada className="flex flex-col items-center gap-5 py-12 text-center">
+          <span className="text-sm font-semibold tracking-wide text-tinta-suave uppercase">
+            Tu solicitud ya está publicada
+          </span>
+          <span className="font-titulos text-4xl font-bold text-marino">
+            {estado.codigo}
+          </span>
+          <p className="max-w-sm leading-relaxed text-tinta-suave">
+            Apunta ese código o toma una captura. Con él puedes buscar tu
+            solicitud en la lista y ver si ya tiene fecha y salón.
+          </p>
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <BotonEnlace href={`/solicitudes?codigo=${estado.codigo}`}>
+              Ver mi solicitud
+            </BotonEnlace>
+            <BotonEnlace href="/" variante="contorno">
+              Volver al inicio
+            </BotonEnlace>
+          </div>
+
+          <div className="w-full max-w-sm border-t border-marino/10 pt-5">
+            <ReportarError solicitudId={solicitudId} />
+          </div>
+        </Tarjeta>
+      );
+    }
+
     return (
       <Tarjeta elevada className="flex flex-col items-center gap-5 py-12 text-center">
         <span className="text-sm font-semibold tracking-wide text-tinta-suave uppercase">
-          Tu solicitud quedó registrada
+          Casi listo: falta contactarnos
         </span>
         <span className="font-titulos text-4xl font-bold text-marino">
           {estado.codigo}
         </span>
-        <p className="max-w-sm leading-relaxed text-tinta-suave">
-          Apunta ese código o toma una captura. Con él puedes buscar tu
-          solicitud en la lista y ver si ya tiene fecha y salón.
-        </p>
         <div className="w-full max-w-md rounded-tarjeta border-2 border-dorado-hondo bg-dorado-tenue p-6 text-left">
           <span className="block font-titulos text-lg font-bold text-marino">
-            ⚠️ Falta un paso: contáctanos
+            Mándanos un mensaje para publicarla
           </span>
           <p className="mt-2 leading-relaxed text-marino">
-            Mándanos un mensaje por WhatsApp o Instagram para confirmarnos que
-            tu solicitud es real. Así la revisamos más rápido y la sacamos
-            adelante. Si no nos escribes, puede que tarde en agendarse.
+            Tu solicitud aún no aparece en la lista. Escríbenos por WhatsApp o
+            Instagram para confirmar que es real; en cuanto le des clic, la
+            publicamos y la empezamos a revisar.
           </p>
           <div className="mt-4 flex flex-col gap-3 sm:flex-row">
             <a
               href={ligaWhatsapp(
-                `Hola, acabo de publicar la solicitud ${estado.codigo} en Lumen y quiero confirmar que es real.`,
+                `Hola, acabo de crear la solicitud ${estado.codigo} en Lumen y quiero confirmar que es real.`,
               )}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={confirmarContacto}
               className="inline-flex min-h-[48px] flex-1 items-center justify-center rounded-suave bg-marino px-5 font-semibold text-white transition-colors hover:bg-marino-claro"
             >
               Escribir por WhatsApp
@@ -86,6 +151,7 @@ export function FormularioAyuda({
               href={CONTACTO.instagram}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={confirmarContacto}
               className="inline-flex min-h-[48px] flex-1 items-center justify-center rounded-suave border-2 border-marino px-5 font-semibold text-marino transition-colors hover:bg-marino-tenue"
             >
               Escribir por Instagram
@@ -93,20 +159,25 @@ export function FormularioAyuda({
           </div>
         </div>
 
-        <div className="flex flex-col gap-3 sm:flex-row">
-          <BotonEnlace href={`/solicitudes?codigo=${estado.codigo}`}>
-            Ver mi solicitud
-          </BotonEnlace>
-          <BotonEnlace href="/" variante="contorno">
-            Volver al inicio
-          </BotonEnlace>
+        <div className="flex flex-col items-center gap-3">
+          <span className="text-sm text-tinta-suave">
+            ¿No quieres continuar?
+          </span>
+          <Boton
+            type="button"
+            variante="contorno"
+            disabled={procesando}
+            onClick={() => {
+              if (procesando) return;
+              iniciar(async () => {
+                await cancelarSolicitud(solicitudId);
+                setFase("cancelada");
+              });
+            }}
+          >
+            {procesando ? "Cancelando…" : "Cancelar solicitud"}
+          </Boton>
         </div>
-
-        {estado.id ? (
-          <div className="w-full max-w-sm border-t border-marino/10 pt-5">
-            <ReportarError solicitudId={estado.id} />
-          </div>
-        ) : null}
       </Tarjeta>
     );
   }

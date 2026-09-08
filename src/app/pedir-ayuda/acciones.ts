@@ -112,6 +112,7 @@ export async function crearSolicitud(
         carrera_id,
         franjas_preferidas: franjas,
         sesiones_deseadas,
+        estado: "oculta",
       },
     });
   }
@@ -125,7 +126,29 @@ export async function crearSolicitud(
   await asegurarHuella();
   await registrarEnvio(tope.recientes);
 
-  revalidatePath("/solicitudes");
-
   return { codigo: creada.codigo_publico, id: creada.id };
+}
+
+export async function publicarSolicitud(id: string): Promise<void> {
+  const solicitud = await db.solicitud.findUnique({
+    where: { id },
+    select: { id: true, estado: true },
+  });
+
+  if (!solicitud || solicitud.estado !== "oculta") return;
+
+  await db.solicitud.update({ where: { id }, data: { estado: "abierta" } });
+
+  revalidatePath("/solicitudes");
+}
+
+export async function cancelarSolicitud(id: string): Promise<void> {
+  const solicitud = await db.solicitud.findUnique({
+    where: { id },
+    select: { id: true, estado: true },
+  });
+
+  if (!solicitud || solicitud.estado !== "oculta") return;
+
+  await db.solicitud.delete({ where: { id } });
 }
