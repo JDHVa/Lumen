@@ -13,7 +13,12 @@ export async function apoyar(datos: FormData) {
     select: { id: true, estado: true },
   });
 
-  if (!solicitud || solicitud.estado !== "abierta") return;
+  if (
+    !solicitud ||
+    (solicitud.estado !== "abierta" && solicitud.estado !== "agendada")
+  ) {
+    return;
+  }
 
   const huella = await asegurarHuella();
 
