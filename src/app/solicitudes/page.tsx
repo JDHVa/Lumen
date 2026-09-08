@@ -244,31 +244,35 @@ export default async function PaginaSolicitudes({
                         sePuedeContestar={solicitud.estado === "abierta"}
                       />
 
-                      {solicitud.estado === "abierta" ? (
-                        apoyada ? (
-                          <p className="text-sm font-medium text-exito">
-                            Ya dijiste que tú también lo necesitas.
-                          </p>
-                        ) : (
-                          <form action={apoyar} className="pt-1">
-                            <input
-                              type="hidden"
-                              name="solicitud_id"
-                              value={solicitud.id}
-                            />
-                            <button
-                              type="submit"
-                              className="inline-flex min-h-[44px] items-center rounded-suave bg-dorado px-4 text-sm font-semibold text-marino-hondo transition-colors hover:bg-dorado-hondo"
-                            >
-                              Yo también lo necesito
-                            </button>
-                          </form>
-                        )
-                      ) : (
+                      {solicitud.estado === "agendada" ? (
                         <p className="text-sm text-tinta-suave">
                           Esta ya tiene sesión asignada. Aparecerá en el inicio
                           con su día y su salón.
                         </p>
+                      ) : null}
+
+                      {apoyada ? (
+                        <p className="text-sm font-medium text-exito">
+                          {solicitud.estado === "agendada"
+                            ? "Ya dijiste que vas a ir."
+                            : "Ya dijiste que tú también lo necesitas."}
+                        </p>
+                      ) : (
+                        <form action={apoyar} className="pt-1">
+                          <input
+                            type="hidden"
+                            name="solicitud_id"
+                            value={solicitud.id}
+                          />
+                          <button
+                            type="submit"
+                            className="inline-flex min-h-[44px] items-center rounded-suave bg-dorado px-4 text-sm font-semibold text-marino-hondo transition-colors hover:bg-dorado-hondo"
+                          >
+                            {solicitud.estado === "agendada"
+                              ? "Voy a ir"
+                              : "Yo también lo necesito"}
+                          </button>
+                        </form>
                       )}
 
                       {solicitud.estado === "abierta" ? (
