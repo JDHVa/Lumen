@@ -87,6 +87,12 @@ export default async function PaginaAgendar({
     })),
   );
 
+  const todosZhensis = await db.usuario.findMany({
+    where: { es_zhensi: true, activo: true },
+    orderBy: { nombre: "asc" },
+    select: { id: true, nombre: true },
+  });
+
   const propuestos = new Set(
     solicitud.propuestas.map((propuesta) => propuesta.zhensi.id),
   );
@@ -256,59 +262,62 @@ export default async function PaginaAgendar({
         </Seccion>
       ) : null}
 
-      {solicitud.estado === "agendada" ? null : candidatos.length === 0 ? (
-        <Seccion titulo="Quién puede darla">
-          <Aviso tono="error">
-            {zhensis.length === 0
-              ? solicitud.materia_id
-                ? "Ningún zhenshi activo tiene esta materia marcada en su perfil. Pídele a alguien que la marque, o agenda la sesión a mano desde Sesiones."
-                : "No hay zhenshis activos con disponibilidad capturada."
-              : `Hay ${zhensis.length} ${zhensis.length === 1 ? "zhenshi que puede" : "zhenshis que pueden"} dar esto, pero ninguno coincide con los horarios que pidieron. Toca negociar otro horario o agendarla a mano desde Sesiones.`}
-          </Aviso>
-        </Seccion>
-      ) : (
+      {solicitud.estado === "agendada" ? null : (
         <>
-          <Seccion
-            titulo="Quién puede darla"
-            descripcion={
-              candidatos.length === 1
-                ? "1 zhenshi da esta materia y coincide en horario."
-                : `${candidatos.length} zhenshis dan esta materia y coinciden en horario.`
-            }
-          >
-            <ul className="flex flex-col gap-2.5">
-              {candidatos.map((candidato) => (
-                <li key={candidato.id}>
-                  <Tarjeta className="flex flex-col gap-1 py-4">
-                    <div className="flex flex-wrap items-center gap-3">
-                      <span className="font-medium text-marino">
-                        {candidato.nombre}
+          {candidatos.length === 0 ? (
+            <Seccion titulo="Quién puede darla">
+              <Aviso tono="error">
+                {zhensis.length === 0
+                  ? solicitud.materia_id
+                    ? "Ningún zhenshi activo tiene esta materia marcada en su perfil. Abajo puedes asignar a quien sea de todos modos."
+                    : "No hay zhenshis activos con disponibilidad capturada. Abajo puedes asignar a quien sea de todos modos."
+                  : `Hay ${zhensis.length} ${zhensis.length === 1 ? "zhenshi que puede" : "zhenshis que pueden"} dar esto, pero ninguno coincide con los horarios que pidieron. Abajo puedes asignar a quien sea con un horario a mano.`}
+              </Aviso>
+            </Seccion>
+          ) : (
+            <Seccion
+              titulo="Quién puede darla"
+              descripcion={
+                candidatos.length === 1
+                  ? "1 zhenshi da esta materia y coincide en horario."
+                  : `${candidatos.length} zhenshis dan esta materia y coinciden en horario.`
+              }
+            >
+              <ul className="flex flex-col gap-2.5">
+                {candidatos.map((candidato) => (
+                  <li key={candidato.id}>
+                    <Tarjeta className="flex flex-col gap-1 py-4">
+                      <div className="flex flex-wrap items-center gap-3">
+                        <span className="font-medium text-marino">
+                          {candidato.nombre}
+                        </span>
+                        {propuestos.has(candidato.id) ? (
+                          <Etiqueta tono="dorado">se propuso</Etiqueta>
+                        ) : null}
+                      </div>
+                      <span className="text-sm text-tinta-suave">
+                        Coincide en{" "}
+                        {candidato.coincidencias
+                          .map((clave) => {
+                            const bloque = leerClaveBloque(clave);
+                            if (!bloque) return "";
+                            return `${nombreDia(bloque.dia)} ${etiquetaDeBloque(bloque.dia, bloque.inicio)}`;
+                          })
+                          .join(", ")}
                       </span>
-                      {propuestos.has(candidato.id) ? (
-                        <Etiqueta tono="dorado">se propuso</Etiqueta>
-                      ) : null}
-                    </div>
-                    <span className="text-sm text-tinta-suave">
-                      Coincide en{" "}
-                      {candidato.coincidencias
-                        .map((clave) => {
-                          const bloque = leerClaveBloque(clave);
-                          if (!bloque) return "";
-                          return `${nombreDia(bloque.dia)} ${etiquetaDeBloque(bloque.dia, bloque.inicio)}`;
-                        })
-                        .join(", ")}
-                    </span>
-                  </Tarjeta>
-                </li>
-              ))}
-            </ul>
-          </Seccion>
+                    </Tarjeta>
+                  </li>
+                ))}
+              </ul>
+            </Seccion>
+          )}
 
           <Seccion titulo="Agendar">
             <FormularioAgendar
               solicitudId={solicitud.id}
               tituloSugerido={nombreCosa}
               candidatos={paraFormulario}
+              todosZhensis={todosZhensis}
               sesionesDeseadas={solicitud.sesiones_deseadas}
             />
           </Seccion>
