@@ -29,6 +29,7 @@ export async function agendar(
   const titulo = String(datos.get("titulo") ?? "").trim();
   const notas = String(datos.get("notas_publicas") ?? "").trim();
   const confirmado = datos.get("confirmar") === "1";
+  const manual = datos.get("modo") === "manual";
 
   if (!solicitud_id || !zhensi_id) {
     return { error: "Falta elegir a quién se le asigna." };
@@ -37,39 +38,58 @@ export async function agendar(
   if (!titulo) return { error: "Ponle un título a la sesión." };
   if (!salon) return { error: "Falta el salón." };
 
-  const claves = datos.getAll("bloque").map((valor) => String(valor));
-  const fechasCrudas = datos.getAll("fecha").map((valor) => String(valor));
-
-  if (claves.length === 0) {
-    return { error: "Marca al menos un día." };
-  }
-
-  if (claves.length !== fechasCrudas.length) {
-    return { error: "Falta ponerle fecha a alguno de los días." };
-  }
-
-  if (claves.length > TOPE_DIAS) {
-    return {
-      error: `Son demasiados días de una sola vez. El tope son ${TOPE_DIAS}.`,
-    };
-  }
-
   const dias: { inicio: string; fin: string; fecha: Date }[] = [];
 
-  for (let indice = 0; indice < claves.length; indice += 1) {
-    const bloque = leerClaveBloque(claves[indice]);
-    if (!bloque) return { error: "Uno de los horarios ya no es válido." };
+  if (manual) {
+    const fecha = aFecha(String(datos.get("fecha") ?? ""));
+    if (!fecha) return { error: "La fecha no es válida." };
 
-    const fecha = aFecha(fechasCrudas[indice]);
-    if (!fecha) return { error: "Una de las fechas no es válida." };
+    const inicio = String(datos.get("hora_inicio") ?? "").trim();
+    const fin = String(datos.get("hora_fin") ?? "").trim();
+    const formato = /^([01]\d|2[0-3]):[0-5]\d$/;
 
-    if (diaSemanaDe(fecha) !== bloque.dia) {
+    if (!formato.test(inicio) || !formato.test(fin)) {
+      return { error: "Pon una hora de inicio y de fin válidas." };
+    }
+
+    if (inicio >= fin) {
+      return { error: "La hora de inicio tiene que ser antes que la de fin." };
+    }
+
+    dias.push({ inicio, fin, fecha });
+  } else {
+    const claves = datos.getAll("bloque").map((valor) => String(valor));
+    const fechasCrudas = datos.getAll("fecha").map((valor) => String(valor));
+
+    if (claves.length === 0) {
+      return { error: "Marca al menos un día." };
+    }
+
+    if (claves.length !== fechasCrudas.length) {
+      return { error: "Falta ponerle fecha a alguno de los días." };
+    }
+
+    if (claves.length > TOPE_DIAS) {
       return {
-        error: `El horario de ${nombreDia(bloque.dia).toLowerCase()} no cuadra con la fecha ${fechaLegible(fecha)} que le pusiste.`,
+        error: `Son demasiados días de una sola vez. El tope son ${TOPE_DIAS}.`,
       };
     }
 
-    dias.push({ inicio: bloque.inicio, fin: bloque.fin, fecha });
+    for (let indice = 0; indice < claves.length; indice += 1) {
+      const bloque = leerClaveBloque(claves[indice]);
+      if (!bloque) return { error: "Uno de los horarios ya no es válido." };
+
+      const fecha = aFecha(fechasCrudas[indice]);
+      if (!fecha) return { error: "Una de las fechas no es válida." };
+
+      if (diaSemanaDe(fecha) !== bloque.dia) {
+        return {
+          error: `El horario de ${nombreDia(bloque.dia).toLowerCase()} no cuadra con la fecha ${fechaLegible(fecha)} que le pusiste.`,
+        };
+      }
+
+      dias.push({ inicio: bloque.inicio, fin: bloque.fin, fecha });
+    }
   }
 
   const repetidos = new Set(

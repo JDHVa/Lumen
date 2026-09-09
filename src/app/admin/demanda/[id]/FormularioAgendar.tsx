@@ -6,8 +6,6 @@ import { Campo } from "@/components/ui/Campo";
 import { Aviso } from "@/components/ui/Aviso";
 import { Tarjeta } from "@/components/ui/Tarjeta";
 import { Selector } from "@/components/ui/Selector";
-import { DIAS, claveBloque } from "@/lib/horarios";
-import { proximaFechaCon, comoTexto } from "@/lib/fechas";
 import { agendar, type EstadoAgenda } from "../acciones";
 
 const estadoInicial: EstadoAgenda = {};
@@ -32,13 +30,6 @@ function sumarSemanas(fecha: string, semanas: number) {
   if (Number.isNaN(base.getTime())) return fecha;
   base.setUTCDate(base.getUTCDate() + semanas * 7);
   return base.toISOString().slice(0, 10);
-}
-
-function fechaSugeridaDeClave(clave: string) {
-  const [diaCrudo] = clave.split("|");
-  const dia = Number(diaCrudo);
-  if (!dia) return "";
-  return comoTexto(proximaFechaCon(dia));
 }
 
 export function FormularioAgendar({
@@ -70,14 +61,12 @@ export function FormularioAgendar({
   );
   const [elegidos, setElegidos] = useState<Record<string, Elegido>>({});
 
-  const primeraClaveOtro = claveBloque(DIAS[0].numero, DIAS[0].bloques[0].inicio);
   const [otroBusqueda, setOtroBusqueda] = useState("");
   const [otroId, setOtroId] = useState("");
   const [listaAbierta, setListaAbierta] = useState(false);
-  const [otroBloque, setOtroBloque] = useState(primeraClaveOtro);
-  const [otroFecha, setOtroFecha] = useState(
-    fechaSugeridaDeClave(primeraClaveOtro),
-  );
+  const [otroFecha, setOtroFecha] = useState("");
+  const [otroInicio, setOtroInicio] = useState("");
+  const [otroFin, setOtroFin] = useState("");
 
   const coincidencias = useMemo(() => {
     const texto = otroBusqueda.trim().toLowerCase();
@@ -94,8 +83,8 @@ export function FormularioAgendar({
 
   const dias = useMemo(() => {
     if (fuente === "otro") {
-      return otroId && otroBloque && otroFecha
-        ? [{ clave: otroBloque, fecha: otroFecha }]
+      return otroId && otroFecha && otroInicio && otroFin && otroInicio < otroFin
+        ? [{ clave: "", fecha: otroFecha }]
         : [];
     }
 
@@ -122,8 +111,9 @@ export function FormularioAgendar({
   }, [
     fuente,
     otroId,
-    otroBloque,
     otroFecha,
+    otroInicio,
+    otroFin,
     modo,
     claveBloqueSel,
     fecha,
@@ -169,11 +159,6 @@ export function FormularioAgendar({
     setOtroId(zhensi.id);
     setOtroBusqueda(zhensi.nombre);
     setListaAbierta(false);
-  }
-
-  function cambiarOtroBloque(clave: string) {
-    setOtroBloque(clave);
-    setOtroFecha(fechaSugeridaDeClave(clave));
   }
 
   const pestana =
@@ -416,6 +401,7 @@ export function FormularioAgendar({
             que ese día sí puede. Tú pones la hora a mano.
           </p>
 
+          <input type="hidden" name="modo" value="manual" />
           <input type="hidden" name="zhensi_id" value={otroId} />
 
           <div className="relative flex flex-col gap-1.5">
@@ -460,25 +446,6 @@ export function FormularioAgendar({
             ) : null}
           </div>
 
-          <Selector
-            etiqueta="Horario"
-            name="bloque"
-            value={otroBloque}
-            onChange={(evento) => cambiarOtroBloque(evento.target.value)}
-            ayuda="Elige a mano el día y la hora de la sesión."
-          >
-            {DIAS.map((dia) =>
-              dia.bloques.map((bloque) => (
-                <option
-                  key={claveBloque(dia.numero, bloque.inicio)}
-                  value={claveBloque(dia.numero, bloque.inicio)}
-                >
-                  {dia.nombre} de {bloque.etiqueta}
-                </option>
-              )),
-            )}
-          </Selector>
-
           <Campo
             etiqueta="Fecha"
             name="fecha"
@@ -486,8 +453,27 @@ export function FormularioAgendar({
             required
             value={otroFecha}
             onChange={(evento) => setOtroFecha(evento.target.value)}
-            ayuda="Se llena sola con la próxima vez que cae ese día."
+            ayuda="El día que la vas a dar."
           />
+
+          <div className="grid gap-5 sm:grid-cols-2">
+            <Campo
+              etiqueta="Hora de inicio"
+              name="hora_inicio"
+              type="time"
+              required
+              value={otroInicio}
+              onChange={(evento) => setOtroInicio(evento.target.value)}
+            />
+            <Campo
+              etiqueta="Hora de fin"
+              name="hora_fin"
+              type="time"
+              required
+              value={otroFin}
+              onChange={(evento) => setOtroFin(evento.target.value)}
+            />
+          </div>
 
           <Campo etiqueta="Salón" name="salon" required placeholder="Aula 12" />
 
