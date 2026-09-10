@@ -30,7 +30,7 @@ export const SE_ABRE_EN_EL_NAVEGADOR = new Set([
   "webp",
 ]);
 
-export const LIMITE_APUNTE = 10 * 1024 * 1024;
+export const LIMITE_APUNTE = 50 * 1024 * 1024;
 export const LIMITE_FOTO = 3 * 1024 * 1024;
 
 export function hayAlmacenamiento() {
@@ -114,6 +114,61 @@ export async function subirArchivo(
     extension,
     url: `${url}/storage/v1/object/public/${BUCKET}/${ruta}`,
   };
+}
+
+export type UrlFirmada =
+  | { ok: true; url_subida: string; url_publica: string; ruta: string }
+  | { ok: false; error: string };
+
+export async function firmarSubida(
+  carpeta: string,
+  extension: string,
+): Promise<UrlFirmada> {
+  if (!hayAlmacenamiento()) {
+    return {
+      ok: false,
+      error:
+        "Todavía no está configurado el almacenamiento de archivos. Avísale a un admin.",
+    };
+  }
+
+  const { url, llave } = base();
+  const ruta = `${carpeta}/${randomUUID()}.${extension}`;
+
+  const respuesta = await fetch(
+    `${url}/storage/v1/object/upload/sign/${BUCKET}/${ruta}`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${llave}`,
+        "Content-Type": "application/json",
+      },
+    },
+  );
+
+  if (!respuesta.ok) {
+    return {
+      ok: false,
+      error: `No se pudo preparar la subida (${respuesta.status}). Vuelve a intentarlo.`,
+    };
+  }
+
+  const datos = (await respuesta.json()) as { url?: string };
+  if (!datos.url) {
+    return { ok: false, error: "No se pudo preparar la subida." };
+  }
+
+  return {
+    ok: true,
+    ruta,
+    url_subida: `${url}/storage/v1${datos.url}`,
+    url_publica: `${url}/storage/v1/object/public/${BUCKET}/${ruta}`,
+  };
+}
+
+export function esUrlPublicaValida(direccion: string, carpeta: string) {
+  const marca = `${base().url}/storage/v1/object/public/${BUCKET}/${carpeta}/`;
+  return direccion.startsWith(marca);
 }
 
 export async function borrarArchivo(direccion: string) {

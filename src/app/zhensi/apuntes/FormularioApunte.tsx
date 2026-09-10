@@ -1,15 +1,25 @@
 "use client";
 
-import { useActionState, useMemo, useRef, useState, useEffect } from "react";
+import {
+  useActionState,
+  useMemo,
+  useRef,
+  useState,
+  useEffect,
+  useTransition,
+  type FormEvent,
+} from "react";
 import { Boton } from "@/components/ui/Boton";
 import { Campo } from "@/components/ui/Campo";
 import { Aviso } from "@/components/ui/Aviso";
 import { Tarjeta } from "@/components/ui/Tarjeta";
 import { Selector } from "@/components/ui/Selector";
 import type { CarreraLista, MateriaLista } from "@/app/admin/catalogo/tipos";
-import { subirApunte, type EstadoApunte } from "./acciones";
+import { subirApunte, pedirUrlDeSubida, type EstadoApunte } from "./acciones";
 
 const estadoInicial: EstadoApunte = {};
+const LIMITE_MB = 50;
+const LIMITE_BYTES = LIMITE_MB * 1024 * 1024;
 
 export function FormularioApunte({
   carreras,
@@ -20,10 +30,12 @@ export function FormularioApunte({
   materias: MateriaLista[];
   carreraPropia: string | null;
 }) {
-  const [estado, accion, enviando] = useActionState(
+  const [estado, accion, guardando] = useActionState(
     subirApunte,
     estadoInicial,
   );
+  const [subiendo, iniciarTransicion] = useTransition();
+  const [errorLocal, setErrorLocal] = useState<string | null>(null);
   const [carreraVista, setCarreraVista] = useState(
     carreraPropia ?? carreras[0]?.id ?? "",
   );
@@ -42,8 +54,54 @@ export function FormularioApunte({
     [materias, carreraVista],
   );
 
+  async function alEnviar(evento: FormEvent<HTMLFormElement>) {
+    evento.preventDefault();
+    setErrorLocal(null);
+
+    const form = evento.currentTarget;
+    const datos = new FormData(form);
+    const archivo = datos.get("archivo");
+
+    if (!(archivo instanceof File) || archivo.size === 0) {
+      setErrorLocal("Falta el archivo.");
+      return;
+    }
+    if (archivo.size > LIMITE_BYTES) {
+      setErrorLocal(`El archivo pasa de ${LIMITE_MB} MB.`);
+      return;
+    }
+
+    const firma = await pedirUrlDeSubida(archivo.type);
+    if (!firma.ok) {
+      setErrorLocal(firma.error);
+      return;
+    }
+
+    const respuesta = await fetch(firma.url_subida, {
+      method: "PUT",
+      headers: { "Content-Type": archivo.type },
+      body: archivo,
+    }).catch(() => null);
+
+    if (!respuesta || !respuesta.ok) {
+      setErrorLocal("No se pudo subir el archivo. Vuelve a intentarlo.");
+      return;
+    }
+
+    const finales = new FormData();
+    finales.set("titulo", String(datos.get("titulo") ?? ""));
+    finales.set("materia_id", String(datos.get("materia_id") ?? ""));
+    finales.set("generacion", String(datos.get("generacion") ?? ""));
+    finales.set("archivo_url", firma.url_publica);
+
+    iniciarTransicion(() => accion(finales));
+  }
+
+  const ocupado = subiendo || guardando;
+  const error = errorLocal ?? estado.error;
+
   return (
-    <form ref={formulario} action={accion} className="flex flex-col gap-5">
+    <form ref={formulario} onSubmit={alEnviar} className="flex flex-col gap-5">
       <Tarjeta elevada className="flex flex-col gap-5 p-6">
         <Campo
           etiqueta="Título"
@@ -91,15 +149,15 @@ export function FormularioApunte({
           required
           accept=".pdf,.jpg,.jpeg,.png,.webp,.doc,.docx,.xls,.xlsx,.ppt,.pptx"
           className="py-2.5 file:mr-3 file:rounded-suave file:border-0 file:bg-marino file:px-3 file:py-2 file:text-sm file:font-medium file:text-white"
-          ayuda="PDF, foto, Word, Excel o PowerPoint. Máximo 10 MB."
+          ayuda="PDF, foto, Word, Excel o PowerPoint. Máximo 50 MB."
         />
       </Tarjeta>
 
-      {estado.error ? <Aviso tono="error">{estado.error}</Aviso> : null}
+      {error ? <Aviso tono="error">{error}</Aviso> : null}
       {estado.exito ? <Aviso tono="exito">{estado.exito}</Aviso> : null}
 
-      <Boton type="submit" variante="secundario" disabled={enviando}>
-        {enviando ? "Subiendo…" : "Subir apunte"}
+      <Boton type="submit" variante="secundario" disabled={ocupado}>
+        {subiendo ? "Subiendo…" : guardando ? "Guardando…" : "Subir apunte"}
       </Boton>
     </form>
   );

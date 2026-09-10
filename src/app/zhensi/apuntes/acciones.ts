@@ -4,13 +4,45 @@ import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import {
-  subirArchivo,
+  firmarSubida,
   borrarArchivo,
+  esUrlPublicaValida,
+  extensionDe,
   TIPOS_APUNTE,
-  LIMITE_APUNTE,
 } from "@/lib/almacenamiento";
 
 export type EstadoApunte = { error?: string; exito?: string };
+
+const EXTENSIONES_APUNTE = new Set(Object.values(TIPOS_APUNTE));
+
+export type UrlSubida =
+  | { ok: true; url_subida: string; url_publica: string }
+  | { ok: false; error: string };
+
+export async function pedirUrlDeSubida(tipo: string): Promise<UrlSubida> {
+  const sesion = await auth();
+  if (!sesion?.user) return { ok: false, error: "Tu sesión se cerró. Vuelve a entrar." };
+  if (!sesion.user.es_zhensi) {
+    return { ok: false, error: "Solo los zhenshis pueden subir apuntes." };
+  }
+
+  const extension = TIPOS_APUNTE[tipo];
+  if (!extension) {
+    return {
+      ok: false,
+      error: "Ese tipo de archivo no se acepta. Revisa la lista de abajo.",
+    };
+  }
+
+  const firma = await firmarSubida("apuntes", extension);
+  if (!firma.ok) return { ok: false, error: firma.error };
+
+  return {
+    ok: true,
+    url_subida: firma.url_subida,
+    url_publica: firma.url_publica,
+  };
+}
 
 export async function subirApunte(
   _estado: EstadoApunte,
@@ -43,19 +75,14 @@ export async function subirApunte(
     return { error: "La generación va como 2024 o como 2023-2024." };
   }
 
-  const archivo = datos.get("archivo");
-  if (!(archivo instanceof File)) {
-    return { error: "Falta el archivo." };
+  const archivo_url = String(datos.get("archivo_url") ?? "");
+  if (!archivo_url) return { error: "Falta el archivo." };
+  if (!esUrlPublicaValida(archivo_url, "apuntes")) {
+    return { error: "El archivo no se subió bien. Vuelve a intentarlo." };
   }
-
-  const subida = await subirArchivo(
-    archivo,
-    "apuntes",
-    TIPOS_APUNTE,
-    LIMITE_APUNTE,
-  );
-
-  if (!subida.ok) return { error: subida.error };
+  if (!EXTENSIONES_APUNTE.has(extensionDe(archivo_url))) {
+    return { error: "Ese tipo de archivo no se acepta. Revisa la lista de abajo." };
+  }
 
   try {
     await db.apunte.create({
@@ -64,11 +91,11 @@ export async function subirApunte(
         materia_id,
         zhensi_id: sesion.user.id,
         generacion: generacion || null,
-        archivo_url: subida.url,
+        archivo_url,
       },
     });
   } catch {
-    await borrarArchivo(subida.url);
+    await borrarArchivo(archivo_url);
     return { error: "No se pudo guardar el apunte. Vuelve a intentarlo." };
   }
 
