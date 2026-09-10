@@ -143,6 +143,7 @@ export async function firmarSubida(
         Authorization: `Bearer ${llave}`,
         "Content-Type": "application/json",
       },
+      body: "{}",
     },
   );
 
